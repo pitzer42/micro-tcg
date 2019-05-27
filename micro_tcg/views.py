@@ -36,6 +36,7 @@ async def login_user(request):
     return web.json_response(response_data)
 
 
+# TODO: storage format for binaries vs json format
 async def protected_view(request):
     try:
         json_request = await request.json()

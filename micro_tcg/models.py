@@ -45,6 +45,24 @@ class User(Entity):
         'token'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self._password = None
+        if 'password' in kwargs:
+            self.password = kwargs['password']
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        self._password = encrypt(value)
+
+    @password.deleter
+    def password(self):
+        del self._password
+
     @classmethod
     async def auth_or_none(cls, db, username, password):
         collection = cls.get_collection(db)
@@ -55,15 +73,10 @@ class User(Entity):
         user = User(**user_data)
         if user.check_password(password):
             user.token = encrypt(user_data['_id'])
-            query = dict(_id=user._id)
+            query = dict(_id=user_data['_id'])
             await collection.update_one(query, user)
             return user
         return None
-
-    def as_document(self):
-        doc = self.__dict__
-        doc['password'] = encrypt(doc['password'])
-        return doc
 
     def check_password(self, value):
         return equals_to_encrypted(value, self.password)

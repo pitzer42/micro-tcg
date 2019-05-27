@@ -1,6 +1,6 @@
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from micro_tcg.main import create_app
-from micro_tcg.tests.test_db import create_test_db, user_data
+from micro_tcg.tests.mock_db import create_test_db, user_data
 
 
 class TestApp(AioHTTPTestCase):
