@@ -41,8 +41,24 @@ class User(Entity):
     __attributes__ = (
         'username',
         'email',
-        'password'
+        'password',
+        'token'
     )
+
+    @classmethod
+    async def auth_or_none(cls, db, username, password):
+        collection = cls.get_collection(db)
+        query = dict(username=username)
+        user_data = await collection.find_one(query)
+        if user_data is None:
+            return None
+        user = User(**user_data)
+        if user.check_password(password):
+            user.token = encrypt(user_data['_id'])
+            query = dict(_id=user._id)
+            await collection.update_one(query, user)
+            return user
+        return None
 
     def as_document(self):
         doc = self.__dict__

@@ -1,6 +1,6 @@
 import unittest
 
-from polls.models import User
+from micro_tcg.models import User
 
 
 class ModelsUserTest(unittest.TestCase):

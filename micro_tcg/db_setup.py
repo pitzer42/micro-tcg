@@ -1,6 +1,6 @@
 import asyncio
 
-from polls.models import User
+from micro_tcg.models import User
 from motor.motor_asyncio import AsyncIOMotorClient
 
 
