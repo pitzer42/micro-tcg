@@ -45,3 +45,16 @@ class TestApp(AioHTTPTestCase):
         assert json_response
         assert 'message' in json_response
         assert 'token' not in json_response
+
+    @unittest_run_loop
+    async def test_sucessful_access_to_protected_view(self):
+        resp = await self.client.get("/users/login", json=user_data)
+        json_response = await resp.json()
+        resp = await self.client.get("/secret", json=json_response)
+        assert resp.status == 200
+
+    @unittest_run_loop
+    async def test_unsucessful_access_to_protected_view(self):
+        authorization = dict(token='invalidtoken')
+        resp = await self.client.get("/secret", json=authorization)
+        assert resp.status != 200

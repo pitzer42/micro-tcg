@@ -16,19 +16,23 @@ def sync(f):
 
 class ModelsUserTest(unittest.TestCase):
 
-    def test_encrypts_password_in_constructor(self):
+    def test_encrypt_password_explicitly(self):
         user = User(password=password)
+        user.encrypt_password()
         assert user.password != password
         assert user.check_password(password)
         assert not user.check_password(wrong_password)
 
 
-    def test_encrypts_password_in_property_assign(self):
-        user = User()
-        user.password = password
-        assert user.password != password
-        assert user.check_password(password)
-        assert not user.check_password(wrong_password)
+    def test_passwords_are_encrypted_in_database(self):
+        user = User(password=password)
+        db = sync(create_test_db())
+        sync(user.save(db))
+        saved_user = sync(User.get_by_id(db, user._id))
+        assert saved_user.password != password
+        assert saved_user.check_password(password)
+        assert not saved_user.check_password(wrong_password)
+
 
     def test_auth(self):
         user = User(

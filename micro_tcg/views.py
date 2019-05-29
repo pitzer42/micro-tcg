@@ -1,7 +1,6 @@
 from aiohttp import web
 from micro_tcg.models import User
 from json.decoder import JSONDecodeError
-from bson import Binary
 
 
 async def put_user(request):
@@ -36,23 +35,19 @@ async def login_user(request):
     return web.json_response(response_data)
 
 
-# TODO: storage format for binaries vs json format
 async def protected_view(request):
     try:
         json_request = await request.json()
-        if 'token' not in json_request:
-            return web.json_response('unauthorized')
         db = request.app['db']
-        #token = Binary(json_request['token'])
-        token = json_request['token'].encode()
+        token = json_request['token']
+        token = token[2:-1].encode()
         query = dict(token=token)
         user = await User.get_collection(db).find_one(query)
         if user is None:
-            return web.json_response('unauthorized')
-        print(user)
+            raise
         return web.json_response('authorized')
-    except JSONDecodeError:
-        return web.json_response('unauthorized')
+    except Exception:
+        return web.json_response('unauthorized', status=402)
 
 
 
