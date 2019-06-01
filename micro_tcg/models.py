@@ -58,7 +58,13 @@ class User(Entity):
     __collection_name__ = 'users'
 
     def __init__(self, *args, **kwargs):
+        self.username = None
+        self.email = None
+        self.password = None
+        self.token = None
+
         super().__init__(self, *args, **kwargs)
+
         assign_from_dict(self, kwargs,
                          'username',
                          'email',
@@ -91,6 +97,16 @@ class User(Entity):
             await collection.update_one(query, update_data)
             return user
         return None
+
+    @classmethod
+    async def validate_token(cls, db, token):
+        collection = cls.get_collection(db)
+        query = dict(token=token)
+        user_data = collection.find_one(query)
+        if user_data is None:
+            return None
+        user = User(**user_data)
+        return user
 
     def check_password(self, value):
         return equals_to_encrypted(value, self.password)

@@ -5,6 +5,7 @@ from micro_tcg.views import *
 users = '/users'
 login = '/users/login'
 secret = '/secret'
+waiting_list = '/waiting_list'
 
 
 def setup_routes(app):
@@ -12,5 +13,6 @@ def setup_routes(app):
         get(users, get_users),
         put(users, put_user),
         get(login, login_user),
-        get(secret, protected_view)
+        get(secret, protected_view),
+        web.get(waiting_list, enter_waiting_list)
     ])

@@ -1,6 +1,8 @@
 from aiohttp import web
 from micro_tcg.models import User
 
+waiting_list = dict()
+
 
 def b_string_to_bytes(b_str: str) -> bytes:
     """
@@ -63,3 +65,34 @@ async def login_user(request):
 @require_auth
 async def protected_view(request):
     return web.json_response('authorized')
+
+
+async def enter_waiting_list(request):
+    response = web.WebSocketResponse()
+    await response.prepare(request)
+    token = await response.receive()
+    db = request.app['db']
+    user = User.validate_token(db, token)
+
+    if user is None:
+        await response.send_json(dict(
+            message='unauthorized user',
+            status=401
+        ))
+        return response
+
+    await response.send_str('you are now in the waiting list')
+
+    waiting_list[token] = response
+    while len(waiting_list) > 2:
+        user_tokens = list(waiting_list.keys())
+        token_a, token_b = user_tokens[0:2]
+        socket_a = waiting_list[token_a]
+        socket_b = waiting_list[token_b]
+        await socket_a.send_str('match ' + token_b)
+        await socket_b.send_str('match ' + token_a)
+        del waiting_list[token_a]
+        del waiting_list[token_b]
+
+    return response
+
