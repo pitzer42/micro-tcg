@@ -1,6 +1,7 @@
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from micro_tcg.main import create_app
-from micro_tcg.tests.mock_db import create_test_db, user_data
+from micro_tcg.tests.mock_db import create_test_db, default_user_data
+from micro_tcg import routes
 
 
 class TestApp(AioHTTPTestCase):
@@ -11,11 +12,11 @@ class TestApp(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_get_users(self):
-        resp = await self.client.request("GET", "/users")
-        assert resp.status == 200
+        resp = await self.client.get(routes.users)
+        self.assertEqual(200, resp.status)
         json_response = await resp.json()
-        assert json_response
-        assert json_response[0]['username'] == user_data['username']
+        self.assertIsNotNone(json_response)
+        self.assertGreater(len(json_response), 0)
 
     @unittest_run_loop
     async def test_put_user(self):
@@ -24,37 +25,50 @@ class TestApp(AioHTTPTestCase):
             email='test_put_user@aiohtp.com',
             password='test_put_user_123'
         )
-        resp = await self.client.put("/users", json=request_data)
-        assert resp.status == 200
-        assert await resp.json()
+        resp = await self.client.put(routes.users, json=request_data)
+        self.assertEqual(200, resp.status)
+        json_response = await resp.json()
+        self.assertIsNotNone(json_response)
 
     @unittest_run_loop
     async def test_successful_login(self):
-        resp = await self.client.get("/users/login", json=user_data)
-        assert resp.status == 200
+        credentials = dict(
+            username=default_user_data['username'],
+            password=default_user_data['password']
+        )
+        resp = await self.client.get(routes.login, json=credentials)
+        self.assertEqual(200, resp.status)
         json_response = await resp.json()
-        assert json_response
-        assert 'token' in json_response
+        self.assertIsNotNone(json_response)
+        self.assertIn('token', json_response)
 
     @unittest_run_loop
     async def test_unsuccessful_login(self):
-        credentials = dict(user_data)
-        credentials['password'] += credentials['password']
-        resp = await self.client.get("/users/login", json=credentials)
+        credentials = dict(
+            username=default_user_data['username'],
+            password=default_user_data['password'] + 'wrong'
+        )
+        resp = await self.client.get(routes.login, json=credentials)
         json_response = await resp.json()
-        assert json_response
-        assert 'message' in json_response
-        assert 'token' not in json_response
+        self.assertIsNotNone(json_response)
+        self.assertIn('message', json_response)
+        self.assertNotIn('token', json_response)
 
     @unittest_run_loop
-    async def test_sucessful_access_to_protected_view(self):
-        resp = await self.client.get("/users/login", json=user_data)
+    async def test_successful_access_to_protected_view(self):
+        credentials = dict(
+            username=default_user_data['username'],
+            password=default_user_data['password']
+        )
+        resp = await self.client.get(routes.login, json=credentials)
         json_response = await resp.json()
-        resp = await self.client.get("/secret", json=json_response)
-        assert resp.status == 200
+        resp = await self.client.get(routes.secret, json=json_response)
+        self.assertEqual(200, resp.status)
 
     @unittest_run_loop
-    async def test_unsucessful_access_to_protected_view(self):
-        authorization = dict(token='invalidtoken')
-        resp = await self.client.get("/secret", json=authorization)
-        assert resp.status != 200
+    async def test_unsuccessful_access_to_protected_view(self):
+        credentials = dict(
+            token='invalid_token'
+        )
+        resp = await self.client.get(routes.secret, json=credentials)
+        self.assertEqual(401, resp.status)

@@ -1,6 +1,31 @@
 from aiohttp import web
 from micro_tcg.models import User
-from json.decoder import JSONDecodeError
+
+
+def b_string_to_bytes(b_str: str) -> bytes:
+    """
+    converts a string containing a bytes literal (ex: 'b"something"') to bytes.
+    """
+    return b_str[2:-1].encode()
+
+
+def require_auth(view):
+    async def wrapper(request):
+        try:
+            json_request = await request.json()
+            token = json_request['token']
+            token = b_string_to_bytes(token)
+            query = dict(token=token)
+            db = request.app['db']
+            user = await User.get_collection(db).find_one(query)
+            if user is None:
+                raise
+            return await view(request)
+        except Exception as e:
+            print(e)
+            return web.json_response('unauthorized user', status=401)
+
+    return wrapper
 
 
 async def put_user(request):
@@ -29,25 +54,12 @@ async def login_user(request):
     password = json_request['password']
     user = await User.auth_or_none(db, username, password)
     if user is None:
-        response_data = dict(message='Wrong credentials', status=400)
+        response_data = dict(message='Wrong credentials', status=401)
         return web.json_response(response_data)
     response_data = dict(token=str(user.token))
     return web.json_response(response_data)
 
 
+@require_auth
 async def protected_view(request):
-    try:
-        json_request = await request.json()
-        db = request.app['db']
-        token = json_request['token']
-        token = token[2:-1].encode()
-        query = dict(token=token)
-        user = await User.get_collection(db).find_one(query)
-        if user is None:
-            raise
-        return web.json_response('authorized')
-    except Exception:
-        return web.json_response('unauthorized', status=402)
-
-
-
+    return web.json_response('authorized')

@@ -1,7 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from micro_tcg.models import User
 
-user_data = dict(
+default_user_data = dict(
     username='tester',
     email='tester@aiohttp.com',
     password='tester123'
@@ -11,5 +11,5 @@ user_data = dict(
 async def create_test_db():
     test_db = AsyncIOMotorClient().micro_tcg_test
     User.get_collection(test_db).drop()
-    await User(**user_data).save(test_db)
+    await User(**default_user_data).save(test_db)
     return test_db
