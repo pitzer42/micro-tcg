@@ -24,7 +24,8 @@ class MicroTcgHttpTestCase(AioHTTPTestCase):
 
     async def get_application(self):
         test_db = await create_test_db()
-        return create_app(db=test_db)
+        app = create_app(db=test_db)
+        return app
 
     class LoginResponse:
 

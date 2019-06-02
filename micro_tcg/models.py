@@ -102,7 +102,7 @@ class User(Entity):
     async def validate_token(cls, db, token):
         collection = cls.get_collection(db)
         query = dict(token=token)
-        user_data = collection.find_one(query)
+        user_data = await collection.find_one(query)
         if user_data is None:
             return None
         user = User(**user_data)

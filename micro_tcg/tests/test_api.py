@@ -71,8 +71,11 @@ class TestAuthAPI(MicroTcgHttpTestCase):
     @unittest_run_loop
     async def test_entering_waiting_list(self):
         response = await self.request_successful_login()
-        async with self.client.ws_connect(routes.waiting_list) as ws:
-            self.assertIsNotNone(ws)
-            await ws.send_str(response.token)
-            ack = await ws.receive_str()
-            self.assertIsNotNone(ack)
+        async with self.client.ws_connect(routes.waiting_list) as socket:
+            credentials = dict(
+                token=response.token
+            )
+            self.assertIsNotNone(socket)
+            await socket.send_json(credentials)
+            json_ack = await socket.receive_json()
+            self.assertIsNotNone(json_ack)

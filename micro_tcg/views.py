@@ -1,13 +1,38 @@
 from aiohttp import web
 from micro_tcg.models import User
+from aiohttp import WSMsgType
 
-waiting_list = dict()
+
+class Match:
+
+    waiting_list = dict()
+
+    @staticmethod
+    async def make_match():
+        # enough players for at least one match
+        while len(Match.waiting_list) > 1:
+
+            # two items make a match
+            token_a, socket_a = Match.waiting_list.popitem()
+            token_b, socket_b = Match.waiting_list.popitem()
+            try:
+                match_a = dict(opponent=token_b)
+                match_b = dict(opponent=token_a)
+                if socket_a.closed or socket_b.closed:
+                    raise IOError
+                await socket_a.send_json(match_a)
+                await socket_b.send_json(match_b)
+            except IOError:
+
+                # something went wrong, keep the items that still active and continue
+                if not socket_a.closed:
+                    Match.waiting_list[token_a] = socket_a
+                if not socket_b.closed:
+                    Match.waiting_list[token_b] = socket_b
 
 
 def b_string_to_bytes(b_str: str) -> bytes:
-    """
-    converts a string containing a bytes literal (ex: 'b"something"') to bytes.
-    """
+    """ converts a string containing a bytes literal (ex: 'b"something"') to bytes. """
     return b_str[2:-1].encode()
 
 
@@ -67,32 +92,47 @@ async def protected_view(request):
     return web.json_response('authorized')
 
 
-async def enter_waiting_list(request):
-    response = web.WebSocketResponse()
-    await response.prepare(request)
-    token = await response.receive()
-    db = request.app['db']
-    user = User.validate_token(db, token)
+def require_auth_websocket(view):
+    async def wrapper(request):
+        socket = web.WebSocketResponse()
+        await socket.prepare(request)
+        request_json = await socket.receive_json()
+        token = b_string_to_bytes(request_json['token'])
+        db = request.app['db']
+        user = await User.validate_token(db, token)
 
-    if user is None:
-        await response.send_json(dict(
-            message='unauthorized user',
-            status=401
-        ))
-        return response
+        if user is None:
+            await socket.send_json(dict(
+                message='unauthorized user',
+                status=401
+            ))
+            return socket
+        return await view(socket, user)
+    return wrapper
 
-    await response.send_str('you are now in the waiting list')
 
-    waiting_list[token] = response
-    while len(waiting_list) > 2:
-        user_tokens = list(waiting_list.keys())
-        token_a, token_b = user_tokens[0:2]
-        socket_a = waiting_list[token_a]
-        socket_b = waiting_list[token_b]
-        await socket_a.send_str('match ' + token_b)
-        await socket_b.send_str('match ' + token_a)
-        del waiting_list[token_a]
-        del waiting_list[token_b]
+@require_auth_websocket
+async def enter_waiting_list(socket, user):
+    ack_json = dict(
+        message='you are now in the waiting list'
+    )
+    await socket.send_json(ack_json)
+    Match.waiting_list[user.username] = socket
 
-    return response
+    await Match.make_match()
+
+    async for message in socket:
+        if message.type == WSMsgType.TEXT:
+            if message.data == 'close':
+                await socket.close()
+            else:
+                print(message)
+        elif message.type == WSMsgType.ERROR:
+            print('%s connection closed with exception %s' % (
+                user.username,
+                socket.exception()
+            ))
+
+    print('closed connection with %s' % user.username)
+    return socket
 
