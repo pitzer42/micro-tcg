@@ -46,21 +46,11 @@ class MicroTCGClient:
         opponents_package = await self.print_message_from_server()
         self.opponent = opponents_package['message']
 
-    async def start(self):
-
-        async def print_loop():
-            while True:
-                await self.print_message_from_server()
-
-        async def prompt_loop():
-            while True:
-                await self.prompt_message_to_server()
-                await asyncio.sleep(0.1)
-
-        await asyncio.gather(
-            print_loop(),
-            prompt_loop()
-        )
+    async def print_and_prompt(self):
+        while True:
+            await self.prompt_message_to_server()
+            await asyncio.sleep(0.5)
+            await self.print_message_from_server()
 
     async def print_message_from_server(self):
         received_message = await self.socket.receive_json()
@@ -77,14 +67,21 @@ class MicroTCGClient:
 
 
 if __name__ == '__main__':
-    print('Micro-TCG')
-    username = input('username:')
-    if username == '':
-        username = 'user1'
-    micro_tcg_client = MicroTCGClient(
-        ClientSession(),
-        username=username,
-        base_url='http://localhost:8080'
-    )
-    asyncio.run(micro_tcg_client.setup())
-    asyncio.run(micro_tcg_client.start())
+
+    async def async_main():
+        print('Micro-TCG')
+
+        username = input('username:')
+        if username == '':
+            username = 'user1'
+
+        micro_tcg_client = MicroTCGClient(
+            ClientSession(),
+            username=username,
+            base_url='http://localhost:8080'
+        )
+
+        await micro_tcg_client.setup()
+        await micro_tcg_client.print_and_prompt()
+
+    asyncio.run(async_main())

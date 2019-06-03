@@ -15,7 +15,7 @@ class Match:
             async for package in player.socket:
                 message = package.data
                 print(player.name + ':' + message)
-                await self.multicast(player, message)
+                await self.multicast(player, package)
         except IOError as error:
             print(error)
 
