@@ -49,5 +49,5 @@ def require_auth_web_socket(view):
                 status=401
             ))
             return socket
-        return await view(socket, user)
+        return await view(request, socket, user)
     return wrapper

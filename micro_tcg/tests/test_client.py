@@ -13,8 +13,8 @@ class TestMicroTCGClient(MicroTcgHttpTestCase):
         client_a = MicroTCGClient(self.client, username=username_a)
         client_b = MicroTCGClient(self.client, username=username_b)
         await asyncio.gather(
-            client_a.start(),
-            client_b.start()
+            client_a.setup(),
+            client_b.setup()
         )
         self.assertEqual(client_a.opponent, username_b)
         self.assertEqual(client_b.opponent, username_a)

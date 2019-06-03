@@ -79,3 +79,4 @@ class TestAuthAPI(MicroTcgHttpTestCase):
             await socket.send_json(credentials)
             json_ack = await socket.receive_json()
             self.assertIsNotNone(json_ack)
+            self.assertIn('message', json_ack)

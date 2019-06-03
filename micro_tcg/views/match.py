@@ -1,55 +1,112 @@
-from aiohttp import WSMsgType
 from micro_tcg.views.decorators import require_auth_web_socket
+import asyncio
 
 
 class Match:
 
-    waiting_list = dict()
+    def __init__(self, players: list):
+        self.players = players
+        self.running = False
 
-    @staticmethod
-    async def make_match():
-        # enough players for at least one match
-        while len(Match.waiting_list) > 1:
+    async def start(self, player):
+        try:
+            message_package = self.welcome_message_for(player)
+            await player.send(message_package)
+            async for package in player.socket:
+                message = package.data
+                print(player.name + ':' + message)
+                await self.multicast(player, message)
+        except IOError as error:
+            print(error)
 
-            # two items make a match
-            token_a, socket_a = Match.waiting_list.popitem()
-            token_b, socket_b = Match.waiting_list.popitem()
-            try:
-                match_a = dict(opponent=token_b)
-                match_b = dict(opponent=token_a)
-                if socket_a.closed or socket_b.closed:
-                    raise IOError
-                await socket_a.send_json(match_a)
-                await socket_b.send_json(match_b)
-            except IOError:
+    def welcome_message_for(self, player):
+        others = self.other_players(player)
+        other_names = ''
+        for other in others:
+            other_names += other.name + ', '
+        other_names = other_names[0:-2]
+        return dict(message=other_names)
 
-                # something went wrong, keep the items that still active and continue
-                if not socket_a.closed:
-                    Match.waiting_list[token_a] = socket_a
-                if not socket_b.closed:
-                    Match.waiting_list[token_b] = socket_b
+    async def broadcast(self, message):
+        for player in self.players:
+            await player.send(message)
+
+    async def multicast(self, emitter, message):
+        for player in self.other_players(emitter):
+            await player.send(message)
+
+    def other_players(self, player):
+        other_players = list(self.players)
+        other_players.remove(player)
+        return other_players
+
+    def get_connected_players(self):
+        connected_players = list()
+        for player in self.players:
+            if not player.socket.closed:
+                connected_players.append(player)
+        return connected_players
+
+
+class Player:
+
+    def __init__(self, name, socket):
+        self.name = name
+        self.socket = socket
+        self.match = None
+        self._disconnection_message = '%s is disconnected' % str(self.name)
+
+    async def send(self, message):
+        if self.socket.closed:
+            raise IOError(self._disconnection_message)
+        return await self.socket.send_json(message)
+
+    async def receive(self):
+        if self.socket.closed:
+            raise IOError(self._disconnection_message)
+        return await self.socket.receive_json()
+
+
+class WaitingList:
+
+    def __init__(self, limit):
+        self.limit = limit
+        self.next_match: asyncio.Event = None
+        self.match: Match = None
+        self.waiting = list()
+
+    def add(self, player):
+        self.waiting.append(player)
+        if len(self.waiting) == 1:
+            self._reset()
+        elif len(self.waiting) == self.limit:
+            self._create_next_match()
+
+    def _reset(self):
+        self.next_match = asyncio.Event()
+
+    def _create_next_match(self):
+        match_players = list(self.waiting)
+        for player in match_players:
+            if player.socket.closed:
+                self.waiting.remove(player)
+        if len(match_players) != len(self.waiting):
+            return
+        self.waiting.clear()
+        self.match = Match(match_players)
+        self.next_match.set()
 
 
 @require_auth_web_socket
-async def enter_waiting_list(socket, user):
-    ack_json = dict(
-        message='you are now in the waiting list'
-    )
-    await socket.send_json(ack_json)
-    Match.waiting_list[user.username] = socket
+async def enter_waiting_list(request, socket, user):
+    waiting_list = request.app['waiting_list']
 
-    await Match.make_match()
+    player = Player(user.username, socket)
+    ack = dict(message='you are now in the waiting list')
+    await player.send(ack)
 
-    async for message in socket:
-        if message.type == WSMsgType.TEXT:
-            if message.data == 'close':
-                await socket.close()
-            else:
-                print(message)
-        elif message.type == WSMsgType.ERROR:
-            print('%s connection closed with exception %s' % (
-                user.username,
-                socket.exception()
-            ))
+    waiting_list.add(player)
+    await waiting_list.next_match.wait()
+    await waiting_list.match.start(player)
 
     return socket
