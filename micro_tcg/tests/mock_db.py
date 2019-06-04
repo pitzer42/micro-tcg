@@ -1,5 +1,6 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from micro_tcg.models import User
+
+from motor.motor_asyncio import AsyncIOMotorClient
 
 default_user_data = dict(
     username='tester',

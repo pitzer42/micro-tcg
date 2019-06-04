@@ -1,82 +1,104 @@
-from micro_tcg import routes
 from aiohttp.test_utils import unittest_run_loop
-from micro_tcg.tests import MicroTcgHttpTestCase
+
+from micro_tcg import routes
+from micro_tcg.tests.util import MicroTcgApiTestCase
 
 
-class TestUsersAPI(MicroTcgHttpTestCase):
+class TestUsersAPI(MicroTcgApiTestCase):
 
     @unittest_run_loop
     async def test_get_users(self):
-        resp = await self.client.get(routes.users)
-        self.assertEqual(200, resp.status)
-        json_response = await resp.json()
+        response = await self.use_case.get_all_users()
+        json_response = await response.json()
+
+        self.assertEqual(200, response.status)
         self.assertIsNotNone(json_response)
         self.assertGreater(len(json_response), 0)
 
     @unittest_run_loop
     async def test_put_user(self):
-        request_data = dict(
-            username='test_put_user',
-            email='test_put_user@aiohtp.com',
-            password='test_put_user_123'
-        )
-        resp = await self.client.put(routes.users, json=request_data)
-        self.assertEqual(200, resp.status)
-        json_response = await resp.json()
+        response = await self.use_case.register_user()
+        json_response = await response.json()
+
+        self.assertEqual(200, response.status)
         self.assertIsNotNone(json_response)
 
 
-class TestAuthAPI(MicroTcgHttpTestCase):
+class TestAuthAPI(MicroTcgApiTestCase):
 
     @unittest_run_loop
     async def test_successful_login(self):
-        response = await self.request_successful_login()
+        response = await self.use_case.login()
+        json_response = await response.json()
+
         self.assertEqual(200, response.status)
-        self.assertIsNotNone(response.json)
-        self.assertIsNotNone(response.token)
+        self.assertIsNotNone(json_response)
+        self.assertIn('token', json_response)
 
     @unittest_run_loop
-    async def test_unsuccessful_login(self):
-        response = await self.request_unsuccessful_login()
-        self.assertIsNotNone(response.json)
-        self.assertIn('message', response.json)
-        self.assertNotIn('token', response.json)
+    async def test_wrong_username_login(self):
+        response = await self.use_case.login_with_wrong_username()
+        json_response = await response.json()
+
+        self.assertEqual(200, response.status)
+        self.assertIsNotNone(json_response)
+        self.assertIn('message', json_response)
+        self.assertNotIn('token', json_response)
+        self.assertIn('status', json_response)
+        self.assertEqual(401, json_response['status'])
+
+    @unittest_run_loop
+    async def test_wrong_password_login(self):
+        response = await self.use_case.login_with_wrong_password()
+        json_response = await response.json()
+
+        self.assertEqual(200, response.status)
+        self.assertIsNotNone(json_response)
+        self.assertIn('message', json_response)
+        self.assertNotIn('token', json_response)
+        self.assertIn('status', json_response)
+        self.assertEqual(401, json_response['status'])
 
     @unittest_run_loop
     async def test_successful_access_to_protected_view(self):
-        response = await self.request_successful_login()
-        response = await self.client.get(routes.secret, json=response.json)
+        await self.use_case.login()
+        doc = dict(
+            token=self.use_case.user.token
+        )
+        response = await self.client.get(
+            routes.secret,
+            json=doc
+        )
         self.assertEqual(200, response.status)
 
     @unittest_run_loop
     async def test_unsuccessful_access_to_protected_view(self):
-        credentials = dict(
-            token='invalid_token'
+        await self.use_case.login_with_wrong_password()
+        doc = dict(
+            token=self.use_case.user.token
         )
         response = await self.client.get(
             routes.secret,
-            json=credentials
+            json=doc
         )
         self.assertEqual(401, response.status)
 
     @unittest_run_loop
     async def test_entering_waiting_list(self):
-        response = await self.request_successful_login()
-        async with self.client.ws_connect(routes.waiting_list) as ws:
-            self.assertIsNotNone(ws)
-            await ws.send_str(response.token)
-            ack = await ws.receive_str()
-            self.assertIsNotNone(ack)
+        await self.use_case.login()
+        ack = await self.use_case.enter_waiting_list()
+        self.assertIsNotNone(self.use_case.socket)
+        self.assertIsNotNone(ack)
+        self.assertIn('message', ack)
+        self.assertIn('status', ack)
+        self.assertEqual(200, ack['status'])
 
     @unittest_run_loop
-    async def test_entering_waiting_list(self):
-        response = await self.request_successful_login()
-        async with self.client.ws_connect(routes.waiting_list) as socket:
-            credentials = dict(
-                token=response.token
-            )
-            self.assertIsNotNone(socket)
-            await socket.send_json(credentials)
-            json_ack = await socket.receive_json()
-            self.assertIsNotNone(json_ack)
-            self.assertIn('message', json_ack)
+    async def test_entering_waiting_list_without_authentication(self):
+        await self.use_case.login_with_wrong_password()
+        ack = await self.use_case.enter_waiting_list()
+        self.assertIsNotNone(self.use_case.socket)
+        self.assertIsNotNone(ack)
+        self.assertIn('message', ack)
+        self.assertIn('status', ack)
+        self.assertEqual(401, ack['status'])

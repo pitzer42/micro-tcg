@@ -72,15 +72,15 @@ class User(Entity):
                          'token'
                          )
 
+    async def save(self, db):
+        bkp = self.password
+        self.encrypt_password()
+        await Entity.save(self, db)
+        self.password = bkp
+
     def encrypt_password(self):
         self.password = encrypt(self.password)
         return self.password
-
-    def as_document(self):
-        doc = super().as_document()
-        if not isinstance(doc['password'], bytes):
-            doc['password'] = encrypt(doc['password'])
-        return doc
 
     @classmethod
     async def auth_or_none(cls, db, username, password):

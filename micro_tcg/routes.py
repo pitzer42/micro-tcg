@@ -1,5 +1,12 @@
-from aiohttp.web import (get, put)
-from micro_tcg.views import (user, match)
+from aiohttp.web import (
+    get,
+    put
+)
+
+from micro_tcg.views import (
+    user,
+    match
+)
 
 
 users = '/users'
