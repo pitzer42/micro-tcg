@@ -2,7 +2,7 @@ import unittest
 
 from micro_tcg.models import User
 from micro_tcg.tests.mock_db import create_test_db
-from micro_tcg.tests.util import sync
+from micro_tcg.tests.util import run_async
 
 username = 'tester123'
 password = 'password123'
@@ -18,7 +18,7 @@ class ModelsUserTest(unittest.TestCase):
         self.assertTrue(user.check_password(password))
         self.assertFalse(user.check_password(wrong_password))
 
-    @sync
+    @run_async
     async def test_passwords_are_encrypted_in_database(self):
         user = User(password=password)
         db = await create_test_db()
@@ -28,7 +28,7 @@ class ModelsUserTest(unittest.TestCase):
         self.assertTrue(saved_user.check_password(password))
         self.assertFalse(saved_user.check_password(wrong_password))
 
-    @sync
+    @run_async
     async def test_auth(self):
         user = User(
             username=username,
