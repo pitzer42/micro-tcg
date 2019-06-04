@@ -2,7 +2,7 @@ import unittest
 
 from micro_tcg.models import User
 from micro_tcg.tests.mock_db import create_test_db
-from micro_tcg.tests import sync
+from micro_tcg.tests.util import sync
 
 username = 'tester123'
 password = 'password123'

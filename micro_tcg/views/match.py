@@ -1,5 +1,6 @@
-from micro_tcg.views.decorators import require_auth_web_socket
 import asyncio
+
+from micro_tcg.views.decorators import require_auth_web_socket
 
 
 class Match:
@@ -102,7 +103,10 @@ async def enter_waiting_list(request, socket, user):
     waiting_list = request.app['waiting_list']
 
     player = Player(user.username, socket)
-    ack = dict(message='you are now in the waiting list')
+    ack = dict(
+        message='you are now in the waiting list',
+        status=200
+    )
     await player.send(ack)
 
     waiting_list.add(player)
