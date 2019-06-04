@@ -7,7 +7,7 @@ from micro_tcg.tests.mock_db import create_test_db
 from micro_tcg.tests.mock_client import MicroTCGClient
 
 
-def sync(f):
+def run_async(f):
     def wrapper(*args, **kwargs):
         try:
             loop = asyncio.get_event_loop()
