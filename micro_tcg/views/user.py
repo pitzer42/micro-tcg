@@ -2,35 +2,37 @@ from aiohttp import web
 
 from micro_tcg.models import User
 from micro_tcg.views.decorators import (
-    db_operation,
     require_auth,
+    inject_db,
+    inject_json
 )
 
 
-@db_operation
-async def insert_one(request, db):
-    json_data = await request.json()
-    new_user = User(**json_data)
+@inject_db
+@inject_json
+async def insert_one(request, db=None, json=None):
+    new_user = User(**json)
     await new_user.save(db)
     return web.json_response('ok')
 
 
-@db_operation
-async def list_all(request, db):
+@inject_db
+async def list_all(request, db=None):
     collection = User.get_collection(db)
     users = await collection.find().to_list(length=100)
     for user in users:
+        # remove _id and password from the payload
         del user['_id']
         del user['password']
         user['token'] = str(user['token'])
     return web.json_response(users)
 
 
-@db_operation
-async def login(request, db):
-    json_request = await request.json()
-    username = json_request['username']
-    password = json_request['password']
+@inject_db
+@inject_json
+async def login(request, db=None, json=None):
+    username = json['username']
+    password = json['password']
     user = await User.auth_or_none(db, username, password)
     if user is None:
         response_data = dict(message='Wrong credentials', status=401)
@@ -40,5 +42,5 @@ async def login(request, db):
 
 
 @require_auth
-async def protected_view(*args):
+async def protected_view(*args, **kwargs):
     return web.json_response('authorized')
