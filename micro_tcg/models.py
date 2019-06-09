@@ -1,7 +1,7 @@
 import bcrypt
 
 
-def encrypt(value):
+def encrypt(value) -> bytes:
     encoded = str(value).encode()
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(encoded, salt)
@@ -16,10 +16,11 @@ def get_value_or_default(d: dict, key, default=None):
     return d[key] if key in d else default
 
 
-def assign_from_dict(obj, d: dict, *attrs):
-    for attr in attrs:
-        value = get_value_or_default(d, attr)
-        setattr(obj, attr, value)
+def assign_dict_to_obj(obj, **kwargs):
+    for key in obj.__dict__.keys():
+        if key in kwargs:
+            value = kwargs[key]
+            setattr(obj, key, value)
 
 
 class Entity:
@@ -27,7 +28,8 @@ class Entity:
     ID_ATTR = '_id'
 
     def __init__(self, *args, **kwargs):
-        assign_from_dict(self, kwargs, Entity.ID_ATTR)
+        self._id = None
+        assign_dict_to_obj(self, **kwargs)
 
     @classmethod
     def get_collection(cls, db):
@@ -58,19 +60,14 @@ class User(Entity):
     __collection_name__ = 'users'
 
     def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+
         self.username = None
         self.email = None
         self.password = None
         self.token = None
 
-        super().__init__(self, *args, **kwargs)
-
-        assign_from_dict(self, kwargs,
-                         'username',
-                         'email',
-                         'password',
-                         'token'
-                         )
+        assign_dict_to_obj(self, **kwargs)
 
     async def save(self, db):
         bkp = self.password

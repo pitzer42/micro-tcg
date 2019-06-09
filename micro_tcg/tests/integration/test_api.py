@@ -1,7 +1,7 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from micro_tcg import routes
-from micro_tcg.tests.util import MicroTcgApiTestCase
+from micro_tcg.tests import MicroTcgApiTestCase
 
 
 class TestUsersAPI(MicroTcgApiTestCase):
