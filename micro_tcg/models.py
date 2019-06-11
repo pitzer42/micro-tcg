@@ -12,10 +12,6 @@ def equals_to_encrypted(value, encrypted_value):
     return bcrypt.checkpw(value, encrypted_value)
 
 
-def get_value_or_default(d: dict, key, default=None):
-    return d[key] if key in d else default
-
-
 def assign_dict_to_obj(obj, **kwargs):
     for key in obj.__dict__.keys():
         if key in kwargs:

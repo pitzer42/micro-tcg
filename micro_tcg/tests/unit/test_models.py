@@ -74,27 +74,6 @@ class TestEqualsToEncrypted(unittest.TestCase):
             self.fail(msg=str(e))
 
 
-class TestGetValueOrDefault(unittest.TestCase):
-    """ Unit tests for micro_tcg.models.get_value_or_default """
-
-    def test_returns_correct_value_for_keys_in_dict(self):
-        key = list(dict_example.keys())[0]
-        expected_value = dict_example[key]
-        value = models.get_value_or_default(dict_example, key)
-        self.assertEqual(value, expected_value)
-
-    def test_returns_None_value_for_keys_not_in_dict(self):
-        key = 'this_key_should_not_be_in_the_dict_example'
-        value = models.get_value_or_default(dict_example, key)
-        self.assertEqual(value, None)
-
-    def test_returns_specified_default_value_for_keys_not_in_dict(self):
-        key = 'this_key_should_not_be_in_the_dict_example'
-        specified_default = 'this_should_be_the_default'
-        value = models.get_value_or_default(dict_example, key, default=specified_default)
-        self.assertEqual(value, specified_default)
-
-
 class TestAssignDictToObj(unittest.TestCase):
     """ Unit tests for micro_tcg.models.assign_dict_to_obj """
 
