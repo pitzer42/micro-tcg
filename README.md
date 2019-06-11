@@ -1,8 +1,8 @@
 # Micro TCG
 A Web API based implementation of a simplified TCG game
 
-#####Features
+####Features
 * Simple user authentication ✔
-* Waiting room
+* Waiting room ✔
 * Deck collection
 * Simplified gameplay
