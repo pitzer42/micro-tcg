@@ -39,7 +39,7 @@ def inject_waiting_list(view):
 
 
 def require_auth(view):
-    """ invokes decorated function if the user is authenticated. 401 otherwise. """
+    """ invokes decorated function if the user_repo is authenticated. 401 otherwise. """
     @inject_db
     @inject_json
     async def wrapper(request, *args, db=None, json=None, **kwargs):
@@ -49,7 +49,7 @@ def require_auth(view):
             user = await User.validate_token(db, token)
             if user is None:
                 raise
-            kwargs['user'] = user
+            kwargs['user_repo'] = user
             kwargs['db'] = db
             kwargs['json'] = json
             return await view(
@@ -59,12 +59,12 @@ def require_auth(view):
             )
         except Exception as e:
             print(e)
-            return web.json_response('unauthorized user', status=401)
+            return web.json_response('unauthorized user_repo', status=401)
     return wrapper
 
 
 def require_auth_web_socket(view):
-    """ invokes decorated function if the user is authenticated. json informing 401 otherwise. """
+    """ invokes decorated function if the user_repo is authenticated. json informing 401 otherwise. """
     @inject_db
     @inject_socket
     async def wrapper(request, *args, db=None, socket=None, **kwargs):
@@ -74,7 +74,7 @@ def require_auth_web_socket(view):
         user = await User.validate_token(db, token)
         if user is None:
             await socket.send_json(dict(
-                message='unauthorized user',
+                message='unauthorized user_repo',
                 status=401
             ))
             return socket

@@ -1,17 +1,6 @@
 import unittest
 from micro_tcg import models
 
-plain_text = 'plaintext'
-
-plain_values = [
-    plain_text,
-    123,
-    1.23,
-    dict(),
-    list(),
-    object,
-    b'bytes'
-]
 
 dict_example = dict(
     a=1,
@@ -39,39 +28,6 @@ class SubExampleObject(BaseExampleObject):
         super().__init__(self, *args, **kwargs)
         self.c = None
         self.d = None
-
-
-class TestEncrypt(unittest.TestCase):
-    """ Unit tests for micro_tcg.models.encrypt """
-
-    def test_hash_is_different_from_plain_text(self):
-        hashed = models.encrypt(plain_text)
-        self.assertNotEqual(plain_text, hashed)
-
-    def test_hash_type_is_bytes(self):
-        hashed = models.encrypt(plain_text)
-        self.assertIsInstance(hashed, bytes)
-
-    def test_hashes_any_type(self):
-        try:
-            map(models.encrypt, plain_values)
-        except Exception as e:
-            self.fail(msg=str(e))
-
-
-class TestEqualsToEncrypted(unittest.TestCase):
-    """ Unit tests for micro_tcg.models.equals_to_encrypted """
-
-    def test_compares_original_plain_value_to_hashed_value(self):
-        hashes = list(map(models.encrypt, plain_values))
-        try:
-            for i in range(len(hashes)):
-                plain_value = plain_values[i]
-                hash_value = hashes[i]
-                are_equal = models.equals_to_encrypted(plain_value, hash_value)
-                self.assertTrue(are_equal)
-        except Exception as e:
-            self.fail(msg=str(e))
 
 
 class TestAssignDictToObj(unittest.TestCase):

@@ -3,8 +3,8 @@ import asyncio
 from aiohttp.test_utils import AioHTTPTestCase
 
 from micro_tcg.server import create_aiohttp_app
-from micro_tcg.tests.mocks.mock_db import create_test_db
-from micro_tcg.tests.mocks.mock_client import MicroTCGClient
+from tests.mocks.mock_db import create_test_db
+from tests.mocks.mock_client import MicroTCGClient
 
 
 def run_async(f):
