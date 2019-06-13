@@ -2,9 +2,9 @@ import asyncio
 
 from aiohttp.test_utils import AioHTTPTestCase
 
-from micro_tcg.server import create_app
-from micro_tcg.tests.mocks.mock_db import create_test_db
-from micro_tcg.tests.mocks.mock_client import MicroTCGClient
+from micro_tcg.server import create_aiohttp_app
+from tests.mocks.mock_db import create_test_db
+from tests.mocks.mock_client import MicroTCGClient
 
 
 def run_async(f):
@@ -24,7 +24,7 @@ class MicroTcgApiTestCase(AioHTTPTestCase):
     async def get_application(self):
         """ create application with test database """
         test_db = await create_test_db()
-        app = create_app(db=test_db)
+        app = create_aiohttp_app(db=test_db)
         return app
 
     async def setUpAsync(self) -> None:
