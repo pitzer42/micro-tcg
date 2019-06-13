@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/pitzer42/micro-tcg.svg?branch=master)](https://travis-ci.com/pitzer42/micro-tcg)
 # Micro TCG
 A Web API based implementation of a simplified TCG game
 
