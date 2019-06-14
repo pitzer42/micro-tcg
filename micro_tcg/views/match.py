@@ -71,6 +71,7 @@ class Player:
         return await self.socket.receive_json()
 
 
+# TODO: Move to models and make WaitingList.match a readonly property
 class WaitingList:
 
     def __init__(self, limit):

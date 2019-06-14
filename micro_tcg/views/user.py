@@ -2,7 +2,6 @@ from aiohttp import web
 
 from micro_tcg.controllers import auth_user
 
-from micro_tcg.models import User
 from micro_tcg.views.decorators import (
     require_auth,
     inject_db,
@@ -50,9 +49,9 @@ async def list_all(request, db=None):
 @inject_db
 @inject_json
 async def login(request, db=None, json=None):
-    username = json['name']
+    name = json['name']
     password = json['password']
-    token = await auth_user.login(db, username, password)
+    token = await auth_user.login(db, name, password)
     if token is None:
         response_data = dict(message='Wrong credentials', status=401)
         return web.json_response(response_data)
