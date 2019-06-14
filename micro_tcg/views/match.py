@@ -104,7 +104,7 @@ class WaitingList:
 @inject_waiting_list
 @require_auth_web_socket
 async def enter_waiting_list(request, *args, socket=None, user=None, waiting_list=None, **kwargs):
-    player = Player(user.username, socket)
+    player = Player(user.name, socket)
     ack = dict(
         message='you are now in the waiting list',
         status=200

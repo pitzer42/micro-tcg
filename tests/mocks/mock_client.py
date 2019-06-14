@@ -10,7 +10,7 @@ class MicroTCGClient:
 
     def __init__(self, session: ClientSession):
         self.user = User(
-            username='default_user',
+            name='default_user',
             email='default@aiohttp.com',
             password='123123',
             token=''
@@ -50,11 +50,11 @@ class MicroTCGClient:
             self.user.token = response_json['token']
         return response
 
-    async def login_with_wrong_username(self):
-        bkp = self.user.username
-        self.user.username += 'wrong'
+    async def login_with_wrong_name(self):
+        bkp = self.user.name
+        self.user.name += 'wrong'
         response = await self.login(expect_success=False)
-        self.user.username = bkp
+        self.user.name = bkp
         return response
 
     async def login_with_wrong_password(self):
@@ -109,9 +109,9 @@ if __name__ == '__main__':
 
         client.base_url = 'http://localhost:8080'
 
-        username = input('username:')
-        if username != '':
-            client.user.username = username
+        name = input('name:')
+        if name != '':
+            client.user.name = name
 
         await client.setup()
         await client.receive_and_send_loop()

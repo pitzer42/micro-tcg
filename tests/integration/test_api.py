@@ -37,7 +37,7 @@ class TestAuthAPI(MicroTcgApiTestCase):
 
     @unittest_run_loop
     async def test_wrong_username_login(self):
-        response = await self.use_case.login_with_wrong_username()
+        response = await self.use_case.login_with_wrong_name()
         json_response = await response.json()
 
         self.assertEqual(200, response.status)

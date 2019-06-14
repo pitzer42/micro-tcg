@@ -4,7 +4,7 @@ from micro_tcg.models import User
 from tests import run_async
 from tests.mocks.mock_db import create_test_db
 
-username = 'tester123'
+name = 'tester123'
 password = 'password123'
 wrong_password = 'password1234'
 
@@ -31,12 +31,12 @@ class ModelsUserTest(unittest.TestCase):
     @run_async
     async def test_auth(self):
         user = User(
-            username=username,
+            name=name,
             password=password
         )
         db = await create_test_db()
         await user.save(db)
-        auth_user = await User.auth_or_none(db, username, password)
+        auth_user = await User.auth_or_none(db, name, password)
         self.assertIsNotNone(auth_user)
         self.assertEqual(auth_user._id, user._id)
         self.assertIsNotNone(auth_user.token)

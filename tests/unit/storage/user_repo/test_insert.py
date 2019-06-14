@@ -1,32 +1,26 @@
-import unittest
-
 from tests import run_async
-from tests.mocks.mock_db import create_test_db
-
+from tests.unit.storage import user_repo
+from tests.unit.storage.user_repo import TestUserRepo
 from micro_tcg.storage.user_repo import (
     insert,
     count
 )
 
-user_data = dict(
-    name='tester',
-    token='some_token',
-    password='secret_password'
-)
+
+user_data = dict(user_repo.user_data)
+user_data['_id'] = None
 
 
-class TestInsertUser(unittest.TestCase):
+class TestInsertUser(TestUserRepo):
 
     @run_async
     async def test_returns_the_inserted_id(self):
-        db = await create_test_db()
-        inserted_id = await insert(db, user_data)
+        inserted_id = await insert(TestUserRepo.__db__, user_data)
         self.assertIsNotNone(inserted_id)
 
     @run_async
     async def test_inserts_one_item_in_the_repository(self):
-        db = await create_test_db()
-        expected = await count(db) + 1
-        await insert(db, user_data)
-        actual = await count(db)
+        expected = await count(TestUserRepo.__db__) + 1
+        await insert(TestUserRepo.__db__, user_data)
+        actual = await count(TestUserRepo.__db__)
         self.assertEqual(actual, expected)

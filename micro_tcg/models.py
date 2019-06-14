@@ -47,7 +47,7 @@ class User(Entity):
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
-        self.username = None
+        self.name = None
         self.email = None
         self.password = None
         self.token = None
@@ -65,9 +65,9 @@ class User(Entity):
         return self.password
 
     @classmethod
-    async def auth_or_none(cls, db, username, password):
+    async def auth_or_none(cls, db, name, password):
         collection = cls.get_collection(db)
-        query = dict(username=username)
+        query = dict(name=name)
         user_data = await collection.find_one(query)
         if user_data is None:
             return None
