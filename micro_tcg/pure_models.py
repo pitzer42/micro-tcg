@@ -5,10 +5,20 @@ def assign_dict_to_obj(obj, **kwargs):
             setattr(obj, key, value)
 
 
+class User:
+
+    def __init__(self, **kwargs):
+        self.username: str = None
+        self.email: str = None
+        self.password: str = None
+        self.token = None
+        assign_dict_to_obj(self, **kwargs)
+
+
 class Match:
 
     def __init__(self, **kwargs):
-        self.players: list[Player] = list()
+        self.players = list()
         assign_dict_to_obj(self, **kwargs)
 
     async def game_loop(self):

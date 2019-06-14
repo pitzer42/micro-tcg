@@ -20,11 +20,24 @@ async def list_all(db, limit=100):
     return users
 
 
+async def get_by_username(db, username: str):
+    collection = db[__storage_name__]
+    query = dict(username=username)
+    return await collection.find_one(query)
+
+
 async def insert(db, user_data: dict) -> int:
     user_data = clean_up_input(user_data)
     collection = db[__storage_name__]
     result = await collection.insert_one(user_data)
     return result.inserted_id
+
+
+async def update_token(db, _id, token):
+    collection = db[__storage_name__]
+    query = dict(_id=_id)
+    operation = operation_set(token=token)
+    return await collection.update_one(query, operation)
 
 
 def clean_up_output(user_data: dict) -> dict:
@@ -45,3 +58,6 @@ def clean_up_input(user_data: dict) -> dict:
         del user_data[__id_attr__]
     return user_data
 
+
+def operation_set(**kwargs):
+    return {'$set': kwargs}
