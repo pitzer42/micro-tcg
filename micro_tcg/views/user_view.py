@@ -8,14 +8,22 @@ from micro_tcg.views.decorators import (
     inject_json
 )
 
-from micro_tcg.storage import user_repo
+from micro_tcg.models.user import (
+    __name_attr__,
+    __password_attr__
+)
+
+from micro_tcg.storage.user_repo import (
+    insert,
+    list_all
+)
 
 
 @inject_db
 @inject_json
 async def insert_one(request, db=None, json=None):
     try:
-        inserted_id = await user_repo.insert(db, json)
+        inserted_id = await insert(db, json)
         response_data = dict(
             status=200,
             inserted_id=inserted_id
@@ -32,7 +40,7 @@ async def insert_one(request, db=None, json=None):
 @inject_db
 async def list_all(request, db=None):
     try:
-        users = await user_repo.list_all(db, limit=100)
+        users = await list_all(db, limit=100)
         response_data = dict(
             status=200,
             users=users
@@ -49,11 +57,14 @@ async def list_all(request, db=None):
 @inject_db
 @inject_json
 async def login(request, db=None, json=None):
-    name = json['name']
-    password = json['password']
+    name = json[__name_attr__]
+    password = json[__password_attr__]
     token = await auth_user.login(db, name, password)
     if token is None:
-        response_data = dict(message='Wrong credentials', status=401)
+        response_data = dict(
+            message='Wrong credentials',
+            status=401
+        )
         return web.json_response(response_data)
     token = str(token)
     response_data = dict(token=token)

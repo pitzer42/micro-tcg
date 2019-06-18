@@ -1,5 +1,5 @@
 import unittest
-from micro_tcg.pure_models import Resource
+from micro_tcg.models.resource import Resource
 
 expected_resource_types = [
         'u',

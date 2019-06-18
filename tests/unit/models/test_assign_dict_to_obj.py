@@ -1,5 +1,5 @@
 import unittest
-from micro_tcg import models
+from micro_tcg.models import assign_dict_to_obj
 
 
 dict_example = dict(
@@ -35,13 +35,13 @@ class TestAssignDictToObj(unittest.TestCase):
 
     def test_assign_object_s_attributes_using_kwargs(self):
         obj = BaseExampleObject()
-        models.assign_dict_to_obj(obj, **dict_example)
+        assign_dict_to_obj(obj, **dict_example)
         self.assertEqual(obj.a, dict_example['a'])
         self.assertEqual(obj.b, dict_example['b'])
 
     def test_assign_sub_object_s_attributes_using_kwargs(self):
         obj = SubExampleObject()
-        models.assign_dict_to_obj(obj, **dict_example_2)
+        assign_dict_to_obj(obj, **dict_example_2)
         self.assertEqual(obj.a, dict_example_2['a'])
         self.assertEqual(obj.b, dict_example_2['b'])
         self.assertEqual(obj.c, dict_example_2['c'])
@@ -49,7 +49,7 @@ class TestAssignDictToObj(unittest.TestCase):
 
     def test_assign_only_attrs_that_are_both_in_class_definition_and_in_kwargs(self):
         obj = BaseExampleObject()
-        models.assign_dict_to_obj(obj, **dict_example_2)
+        assign_dict_to_obj(obj, **dict_example_2)
         self.assertEqual(obj.a, dict_example_2['a'])
         self.assertEqual(obj.b, dict_example_2['b'])
         self.assertRaises(AttributeError, lambda o: o.c, obj)

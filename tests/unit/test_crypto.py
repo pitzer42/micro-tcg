@@ -1,5 +1,5 @@
 import unittest
-from micro_tcg.crypto import (
+from micro_tcg.crypt import (
     encrypt,
     equals_to_encrypted
 )

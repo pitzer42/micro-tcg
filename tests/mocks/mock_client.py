@@ -3,18 +3,15 @@ import asyncio
 from aiohttp import ClientSession
 
 from micro_tcg import routes
-from micro_tcg.models import User
+from micro_tcg.models.user import User
+
+from tests.unit.storage.user_repo import user_data
 
 
 class MicroTCGClient:
 
     def __init__(self, session: ClientSession):
-        self.user = User(
-            name='default_user',
-            email='default@aiohttp.com',
-            password='123123',
-            token=''
-        )
+        self.user = User(**user_data)
         self.base_url = ''
         self.session = session
         self.opponent = None
@@ -32,7 +29,7 @@ class MicroTCGClient:
 
     async def register_user(self):
         url = self.base_url + routes.users
-        doc = self.user.as_document()
+        doc = self.user.__dict__
         return await self.session.put(
             url,
             json=doc
@@ -40,14 +37,14 @@ class MicroTCGClient:
 
     async def login(self, expect_success=True):
         url = self.base_url + routes.login
-        doc = self.user.as_document()
+        doc = self.user.__dict__
         response = await self.session.get(
             url,
             json=doc
         )
         if expect_success:
             response_json = await response.json()
-            self.user.token = response_json['token']
+            self.user.token = response_json[User.__token_attr__]
         return response
 
     async def login_with_wrong_name(self):

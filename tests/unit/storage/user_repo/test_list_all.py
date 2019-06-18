@@ -7,7 +7,7 @@ class TestListAllUsers(TestUserRepo):
 
     @run_async
     async def test_returns_a_list_of_dicts(self):
-        users = await list_all(TestUserRepo.__db__)
+        users = await list_all(TestUserRepo._db)
         user = users[0]
         self.assertIsInstance(users, list)
         self.assertIsInstance(user, dict)
@@ -15,5 +15,5 @@ class TestListAllUsers(TestUserRepo):
     @run_async
     async def test_limit_result_length(self):
         expected_length = 0
-        users = await list_all(TestUserRepo.__db__, limit=expected_length)
+        users = await list_all(TestUserRepo._db, limit=expected_length)
         self.assertEqual(len(users), expected_length)

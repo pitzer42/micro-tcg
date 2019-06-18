@@ -13,10 +13,10 @@ user_data = dict(
 
 class TestUserRepo(unittest.TestCase):
 
-    __db__ = None
+    _db = None
 
     @run_async
     async def setUp(self) -> None:
-        TestUserRepo.__db__ = await create_test_db()
-        inserted_id = await insert(TestUserRepo.__db__, user_data)
+        TestUserRepo._db = await create_test_db()
+        inserted_id = await insert(TestUserRepo._db, user_data)
         user_data['_id'] = inserted_id

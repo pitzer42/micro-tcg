@@ -1,7 +1,7 @@
 from aiohttp import web
 from micro_tcg.routes import setup_routes
 from motor.motor_asyncio import AsyncIOMotorClient
-from micro_tcg.views.match import WaitingList
+from micro_tcg.models.waiting_list import WaitingList
 
 
 def create_aiohttp_app(db=None):

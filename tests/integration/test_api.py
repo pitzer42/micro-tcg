@@ -1,7 +1,7 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from micro_tcg import routes
-from tests import MicroTcgApiTestCase
+from tests.integration import MicroTcgApiTestCase
 
 
 class TestUsersAPI(MicroTcgApiTestCase):
@@ -87,6 +87,7 @@ class TestAuthAPI(MicroTcgApiTestCase):
     async def test_entering_waiting_list(self):
         await self.use_case.login()
         ack = await self.use_case.enter_waiting_list()
+
         self.assertIsNotNone(self.use_case.socket)
         self.assertIsNotNone(ack)
         self.assertIn('message', ack)
@@ -97,6 +98,7 @@ class TestAuthAPI(MicroTcgApiTestCase):
     async def test_entering_waiting_list_without_authentication(self):
         await self.use_case.login_with_wrong_password()
         ack = await self.use_case.enter_waiting_list()
+
         self.assertIsNotNone(self.use_case.socket)
         self.assertIsNotNone(ack)
         self.assertIn('message', ack)

@@ -1,6 +1,6 @@
 from aiohttp import web
 
-from micro_tcg.models import User
+from micro_tcg.storage.user_repo import get_by_token
 
 
 def b_string_to_bytes(b_str: str) -> bytes:
@@ -46,7 +46,7 @@ def require_auth(view):
         try:
             token = json['token']
             token = b_string_to_bytes(token)
-            user = await User.validate_token(db, token)
+            user = await get_by_token(db, token)
             if user is None:
                 raise
             kwargs['user_repo'] = user
@@ -71,7 +71,7 @@ def require_auth_web_socket(view):
         json = await socket.receive_json()
         token = json['token']
         token = b_string_to_bytes(token)
-        user = await User.validate_token(db, token)
+        user = await get_by_token(db, token)
         if user is None:
             await socket.send_json(dict(
                 message='unauthorized user_repo',
