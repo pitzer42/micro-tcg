@@ -10,7 +10,7 @@ class Match:
     __clients_attr__ = 'clients'
 
     def __init__(self, **kwargs):
-        setattr(self, Match.__clients_attr__, ConnectionGroup())
+        setattr(self, Match.__clients_attr__, ConnectionGroup(list()))
         self.running = False
         assign_dict_to_obj(self, **kwargs)
 
@@ -33,6 +33,6 @@ class Match:
         for other in self.clients.clients:
             if client is other:
                 continue
-            other_names += other.name + ', '
+            other_names += other._id + ', '
         other_names = other_names[0:-2]
         return dict(message=other_names)

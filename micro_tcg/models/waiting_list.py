@@ -1,6 +1,9 @@
 import asyncio
 from micro_tcg.models.match import Match
-from micro_tcg.io.user_io import ClientConnection
+from micro_tcg.io.user_io import (
+    ClientConnection,
+    ConnectionGroup
+)
 
 
 # TODO: Move to models and make WaitingList.match a readonly property
@@ -31,5 +34,6 @@ class WaitingList:
         if len(match_players) != len(self.waiting):
             return
         self.waiting.clear()
-        self.match = Match(match_players)
+        client_group = ConnectionGroup(match_players)
+        self.match = Match(clients=client_group)
         self.next_match.set()
