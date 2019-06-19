@@ -13,7 +13,7 @@ from micro_tcg.storage.user_repo import (
 )
 
 
-class TestRespositoryConstraints(unittest.TestCase):
+class TestRepositoryConstraints(unittest.TestCase):
 
     @run_async
     async def test_passwords_are_encrypted_in_database(self):

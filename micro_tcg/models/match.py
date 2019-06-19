@@ -1,17 +1,18 @@
-from micro_tcg.io.user_io import (
-    ClientConnection,
-    ConnectionGroup
-)
 from micro_tcg.models import assign_dict_to_obj
+
+from micro_tcg.io.client_connection import ClientConnection
+from micro_tcg.io.connection_group import ConnectionGroup
 
 
 class Match:
 
     __clients_attr__ = 'clients'
+    __running_attr__ = 'running'
 
     def __init__(self, **kwargs):
-        setattr(self, Match.__clients_attr__, ConnectionGroup(list()))
-        self.running = False
+        clients = ConnectionGroup([])
+        setattr(self, Match.__clients_attr__, clients)
+        setattr(self, Match.__running_attr__, False)
         assign_dict_to_obj(self, **kwargs)
 
     async def game_loop(self):

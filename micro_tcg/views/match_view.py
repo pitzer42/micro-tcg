@@ -1,4 +1,4 @@
-from micro_tcg.io.user_io import ClientConnection
+from micro_tcg.io.client_connection import ClientConnection
 
 from micro_tcg.models.user import User
 

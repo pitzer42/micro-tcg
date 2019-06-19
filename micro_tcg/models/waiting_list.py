@@ -1,9 +1,7 @@
 import asyncio
 from micro_tcg.models.match import Match
-from micro_tcg.io.user_io import (
-    ClientConnection,
-    ConnectionGroup
-)
+from micro_tcg.io.client_connection import ClientConnection
+from micro_tcg.io.connection_group import ConnectionGroup
 
 
 # TODO: Move to models and make WaitingList.match a readonly property
