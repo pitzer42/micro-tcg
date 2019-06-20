@@ -15,9 +15,6 @@ class Match:
         setattr(self, Match.__running_attr__, False)
         assign_dict_to_obj(self, **kwargs)
 
-    async def game_loop(self):
-        pass
-
     async def start(self, client: ClientConnection):
         try:
             message_package = self.welcome_message_for(client)
@@ -26,6 +23,7 @@ class Match:
                 message = package.data
                 print(client.name + ':' + message)
                 await self.clients.multicast(client, package)
+            print(client.socket)
         except IOError as error:
             print(error)
 

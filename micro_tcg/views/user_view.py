@@ -4,8 +4,8 @@ from micro_tcg.controllers import auth_user
 
 from micro_tcg.views.decorators import (
     require_auth,
-    inject_db,
-    inject_json
+    extract_db,
+    extract_json
 )
 
 from micro_tcg.models.user import (
@@ -19,8 +19,8 @@ from micro_tcg.storage.user_repo import (
 )
 
 
-@inject_db
-@inject_json
+@extract_db
+@extract_json
 async def insert_one(request, db=None, json=None):
     try:
         inserted_id = await insert(db, json)
@@ -37,7 +37,7 @@ async def insert_one(request, db=None, json=None):
         return web.json_response(response_data)
 
 
-@inject_db
+@extract_db
 async def list_all(request, db=None):
     try:
         users = await list_all(db, limit=100)
@@ -54,8 +54,8 @@ async def list_all(request, db=None):
         return web.json_response(response_data)
 
 
-@inject_db
-@inject_json
+@extract_db
+@extract_json
 async def login(request, db=None, json=None):
     name = json[__name_attr__]
     password = json[__password_attr__]

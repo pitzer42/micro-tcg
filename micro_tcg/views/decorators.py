@@ -8,21 +8,21 @@ def b_string_to_bytes(b_str: str) -> bytes:
     return b_str[2:-1].encode()
 
 
-def inject_json(view):
+def extract_json(view):
     async def wrapper(request, *args, **kwargs):
         kwargs['json'] = await request.json()
         return await view(request, *args, **kwargs)
     return wrapper
 
 
-def inject_db(view):
+def extract_db(view):
     async def wrapper(request, *args, **kwargs):
         kwargs['db'] = request.app['db']
         return await view(request, *args, **kwargs)
     return wrapper
 
 
-def inject_socket(view):
+def extract_socket(view):
     async def wrapper(request, *args, **kwargs):
         socket = web.WebSocketResponse()
         await socket.prepare(request)
@@ -31,17 +31,24 @@ def inject_socket(view):
     return wrapper
 
 
-def inject_waiting_list(view):
+def extract_waiting_list(view):
     async def wrapper(request, *args, **kwargs):
         kwargs['waiting_list'] = request.app['waiting_list']
         return await view(request, *args, **kwargs)
     return wrapper
 
 
+def extract_game_loop(view):
+    async def wrapper(request, *args, **kwargs):
+        kwargs['game_loop'] = request.app['game_loop']
+        return await view(request, *args, **kwargs)
+    return wrapper
+
+
 def require_auth(view):
     """ invokes decorated function if the user_repo is authenticated. 401 otherwise. """
-    @inject_db
-    @inject_json
+    @extract_db
+    @extract_json
     async def wrapper(request, *args, db=None, json=None, **kwargs):
         try:
             token = json['token']
@@ -65,8 +72,8 @@ def require_auth(view):
 
 def require_auth_web_socket(view):
     """ invokes decorated function if the user_repo is authenticated. json informing 401 otherwise. """
-    @inject_db
-    @inject_socket
+    @extract_db
+    @extract_socket
     async def wrapper(request, *args, db=None, socket=None, **kwargs):
         json = await socket.receive_json()
         token = json['token']

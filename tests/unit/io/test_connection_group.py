@@ -6,10 +6,12 @@ from tests.mocks.mock_socket import SocketMock
 from micro_tcg.io.client_connection import ClientConnection
 from micro_tcg.io.connection_group import ConnectionGroup
 
+default_group_size = 3
 
-def create_connection_group(size=3):
-    client_sockets = [SocketMock() for i in range(size)]
-    clients = [ClientConnection(i, client_sockets[i]) for i in range(size)]
+
+def create_connection_group():
+    client_sockets = [SocketMock() for i in range(default_group_size)]
+    clients = [ClientConnection(i, client_sockets[i]) for i in range(default_group_size)]
     return ConnectionGroup(clients)
 
 
@@ -35,6 +37,15 @@ class TestConnectionGroup(unittest.TestCase):
             else:
                 self.assertNotIn(message, client.socket.sent_messages)
 
+    def test_group_has_size_property(self):
+        group = create_connection_group()
+
+        def set_size():
+            group.size = 0
+
+        self.assertRaises(Exception, set_size)
+        self.assertEquals(group.size, default_group_size)
+
     def test_get_connected_clients(self):
         group = create_connection_group()
         connected_clients = group.get_connected_clients()
@@ -44,4 +55,9 @@ class TestConnectionGroup(unittest.TestCase):
         connected_clients = group.get_connected_clients()
         self.assertEqual(len(connected_clients), 0)
 
-
+    def test_connection_group_is_iterable(self):
+        group = create_connection_group()
+        counter = 0
+        for _ in group:
+            counter += 1
+        self.assertEquals(counter, default_group_size)

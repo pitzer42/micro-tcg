@@ -4,15 +4,17 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from micro_tcg.models.waiting_list import WaitingList
 
 
-def create_aiohttp_app(db=None):
+def create_aiohttp_app(db=None, game_loop=None):
     new_app = web.Application()
 
     if db is None:
         db = AsyncIOMotorClient().micro_tcg
     new_app['db'] = db
 
-    # in memory data structure
+    # must be kept in memory for event synchronization purposes
     new_app['waiting_list'] = WaitingList(2)
+
+    new_app['game_loop'] = game_loop
 
     setup_routes(new_app)
     return new_app

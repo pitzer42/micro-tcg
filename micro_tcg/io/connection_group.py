@@ -1,7 +1,16 @@
 class ConnectionGroup:
 
+    __size_attr__ = 'size'
+
     def __init__(self, clients):
         self.clients = clients
+
+    def __iter__(self):
+        return iter(self.clients)
+
+    @property
+    def size(self):
+        return len(self.clients)
 
     async def broadcast(self, message):
         for client in self.clients:
