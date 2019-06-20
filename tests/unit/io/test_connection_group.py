@@ -44,7 +44,7 @@ class TestConnectionGroup(unittest.TestCase):
             group.size = 0
 
         self.assertRaises(Exception, set_size)
-        self.assertEquals(group.size, default_group_size)
+        self.assertEqual(group.size, default_group_size)
 
     def test_get_connected_clients(self):
         group = create_connection_group()
@@ -60,4 +60,4 @@ class TestConnectionGroup(unittest.TestCase):
         counter = 0
         for _ in group:
             counter += 1
-        self.assertEquals(counter, default_group_size)
+        self.assertEqual(counter, default_group_size)
