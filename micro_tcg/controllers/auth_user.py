@@ -1,13 +1,7 @@
 import time
 
 from micro_tcg.models.user import User
-
-from micro_tcg.storage.user_repo import (
-    get_by_name,
-    set_user_token,
-    update_token,
-    get_by_token
-)
+from micro_tcg.storage import user_repo as users
 
 from micro_tcg.crypt import (
     encrypt,
@@ -16,7 +10,7 @@ from micro_tcg.crypt import (
 
 
 async def login(db, name: str, password: str):
-    user_data = await get_by_name(db, name)
+    user_data = await users.get_by_name(db, name)
     if user_data is None:
         return
     password_hash = user_data[User.__password_attr__]
@@ -25,17 +19,17 @@ async def login(db, name: str, password: str):
     user_id = user_data[User.__id_attr__]
     token = get_timestamp() + str(user_id)
     token = encrypt(token)
-    await set_user_token(db, user_id, token)
+    await users.set_token(db, user_id, token)
     return token
 
 
 async def validate_token(db, token):
-    user = await get_by_token(db, token)
+    user = await users.get_by_token(db, token)
     return user is not None
 
 
 async def logout(db, token):
-    await update_token(db, token, None)
+    await users.replace_token(db, token, None)
 
 
 def get_timestamp() -> str:

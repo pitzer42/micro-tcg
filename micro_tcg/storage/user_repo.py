@@ -55,7 +55,7 @@ async def insert(db, user_data: dict) -> int:
     return result.inserted_id
 
 
-async def set_user_token(db, user_id, token):
+async def set_token(db, user_id, token):
     collection = get_collection(db)
     query = {
         User.__id_attr__: user_id
@@ -64,7 +64,7 @@ async def set_user_token(db, user_id, token):
     return await collection.update_one(query, operation)
 
 
-async def update_token(db, old_token, updated_token):
+async def replace_token(db, old_token, updated_token):
     collection = get_collection(db)
     query = {
         User.__token_attr__: old_token
