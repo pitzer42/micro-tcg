@@ -19,7 +19,13 @@ class WaitingList:
         else:
             copy = list(self.w_list)
             self.w_list.clear()
+            if len(copy) != self.limit:
+                print('BUG 1')
             self.connection_group = ConnectionGroup(copy)
+            print('waiters ' + str(len(self.ready._waiters)))
             self.ready.set()
-            self.ready.clear()
+
+        if client not in self.connection_group:
+            print('BUG 2')
+
         return self.connection_group

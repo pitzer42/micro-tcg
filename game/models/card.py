@@ -1,5 +1,5 @@
 from engine.models import assign_dict_to_obj
-from game.resource import Resource
+from game.models.resource import Resource
 
 
 class Card:

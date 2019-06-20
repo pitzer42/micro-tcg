@@ -91,7 +91,8 @@ class MicroTCGClient:
 
     async def receive_and_print(self):
         answer = await self.socket.receive_json()
-        print(answer)
+        text = self.user.name + ' < ' + repr(answer)
+        print(text)
         return answer
 
 

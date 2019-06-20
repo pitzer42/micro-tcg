@@ -1,5 +1,5 @@
 import unittest
-from game.resource import Resource
+from game.models.resource import Resource
 
 expected_resource_types = [
         'u',

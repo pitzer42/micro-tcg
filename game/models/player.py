@@ -1,6 +1,6 @@
 from engine.models import assign_dict_to_obj
-from game.card import Card
-from game.resource import Resource
+from game.models.card import Card
+from game.models.resource import Resource
 
 
 class Player:

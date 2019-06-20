@@ -1,3 +1,6 @@
+from engine.io.client_connection import ClientConnection
+
+
 class ConnectionGroup:
 
     __size_attr__ = 'size'
@@ -7,6 +10,11 @@ class ConnectionGroup:
 
     def __iter__(self):
         return iter(self.clients)
+
+    def __contains__(self, item):
+        if isinstance(item, ClientConnection):
+            return item in self.clients
+        return False
 
     @property
     def size(self):

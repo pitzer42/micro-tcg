@@ -10,6 +10,8 @@ async def game_loop(player: ClientConnection, all_players: ConnectionGroup):
                 continue
             other_names += other._id + ', '
         other_names = other_names[0:-2]
+        if ',' in other_names:
+            print()
         return dict(message=other_names)
 
     try:
