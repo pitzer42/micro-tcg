@@ -1,7 +1,3 @@
-__name_attr__ = 'name'
-__token_attr__ = 'token'
-__password_attr__ = 'password'
-
 from micro_tcg.models import assign_dict_to_obj
 
 

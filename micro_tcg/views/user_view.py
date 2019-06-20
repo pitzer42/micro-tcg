@@ -8,10 +8,7 @@ from micro_tcg.views.decorators import (
     extract_json
 )
 
-from micro_tcg.models.user import (
-    __name_attr__,
-    __password_attr__
-)
+from micro_tcg.models.user import User
 
 from micro_tcg.storage.user_repo import (
     insert,
@@ -57,8 +54,8 @@ async def list_all(request, db=None):
 @extract_db
 @extract_json
 async def login(request, db=None, json=None):
-    name = json[__name_attr__]
-    password = json[__password_attr__]
+    name = json[User.__name_attr__]
+    password = json[User.__password_attr__]
     token = await auth_user.login(db, name, password)
     if token is None:
         response_data = dict(
