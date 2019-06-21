@@ -1,0 +1,8 @@
+digraph "classes" {
+charset="utf-8"
+rankdir=BT
+"0" [label="{ClientConnection|group : NoneType\lis_connected\lsocket\l|receive()\lsend()\l}", shape="record"];
+"1" [label="{ConnectionGroup|clients : list\lsize\l|add()\lbroadcast()\lget_connected_clients()\lmulticast()\l}", shape="record"];
+"2" [label="{User|\l|}", shape="record"];
+"3" [label="{WaitingList|limit\lw_list : list\l|next_group()\l}", shape="record"];
+}

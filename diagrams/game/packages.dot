@@ -1,0 +1,12 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="game", shape="box"];
+"1" [label="game.models", shape="box"];
+"2" [label="game.models.card", shape="box"];
+"3" [label="game.models.player", shape="box"];
+"4" [label="game.models.resource", shape="box"];
+"2" -> "4" [arrowhead="open", arrowtail="none"];
+"3" -> "2" [arrowhead="open", arrowtail="none"];
+"3" -> "4" [arrowhead="open", arrowtail="none"];
+}
