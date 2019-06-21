@@ -1,3 +1,4 @@
+from engine.io.gamepad import Gamepad
 from engine.io.connection_group import ConnectionGroup
 from engine.io.client_connection import ClientConnection
 
@@ -17,3 +18,16 @@ async def chat_loop(main_client: ClientConnection, all_clients: ConnectionGroup)
             await all_clients.multicast(main_client, package)
     except IOError as error:
         print(error)
+
+
+class ChatGamepad(Gamepad):
+
+    def __init__(self, *args, **kwargs):
+        Gamepad.__init__(self, *args, **kwargs)
+        self.other_clients_in_chat: str = None
+
+    async def start(self):
+        await Gamepad.start(self)
+        others = await self.receive_and_print()
+        self.other_clients_in_chat = others['message']
+        return others

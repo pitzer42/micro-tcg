@@ -1,10 +1,15 @@
 from aiohttp.test_utils import unittest_run_loop
 
-from engine import routes
 from tests.engine_tests.integration.api import EngineAPITestCase
+
+from engine import routes
 
 
 class AuthAPITestCase(EngineAPITestCase):
+
+    async def setUpAsync(self) -> None:
+        await EngineAPITestCase.setUpAsync(self)
+        await self.use_case.register_user()
 
     @unittest_run_loop
     async def test_successful_login(self):

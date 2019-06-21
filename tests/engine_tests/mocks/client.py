@@ -1,39 +1,13 @@
-import asyncio
-
-from aiohttp import ClientSession
-
-from tests.engine_tests.unit.storage.user_repo import user_data
-
 from engine import routes
+from engine.io.gamepad import Gamepad
 from engine.models.user import User
 
 
-class EngineClient:
-
-    def __init__(self, session: ClientSession):
-        self.user = User(**user_data)
-        setattr(self.user, User.__id_attr__, None)
-        self.base_url = ''
-        self.session = session
-        self.clients_in_chat = None
-        self.socket = None
-
-    async def join_match(self):
-        await self.register_user()
-        await self.login()
-        await self.enter_waiting_list()
+class TestGamepad(Gamepad):
 
     async def get_all_users(self):
         url = self.base_url + routes.users
         return await self.session.get(url)
-
-    async def register_user(self):
-        url = self.base_url + routes.users
-        doc = self.user.__dict__
-        return await self.session.put(
-            url,
-            json=doc
-        )
 
     async def login(self, expect_success=True):
         url = self.base_url + routes.login
@@ -60,53 +34,3 @@ class EngineClient:
         response = await self.login(expect_success=False)
         self.user.password = bkp
         return response
-
-    async def enter_waiting_list(self):
-        url = self.base_url + routes.waiting_list
-        self.socket = await self.session.ws_connect(url)
-        doc = dict(
-            token=self.user.token
-        )
-        await self.socket.send_json(doc)
-        return await self.receive_and_print()
-
-    async def receive_and_send_loop(self):
-        while True:
-            await self.prompt_and_send()
-            await asyncio.sleep(0.5)
-            await self.receive_and_print()
-
-    async def prompt_and_send(self):
-        message = input(':')
-        package = dict(
-            message=message
-        )
-        await self.socket.send_json(package)
-        return message
-
-    async def receive_and_print(self):
-        answer = await self.socket.receive_json()
-        text = self.user.name + ' < ' + repr(answer)
-        print(text)
-        return answer
-
-
-if __name__ == '__main__':
-
-    async def client_cli():
-        print('Chat')
-
-        client = EngineClient(
-            ClientSession()
-        )
-
-        client.base_url = 'http://localhost:8080'
-
-        name = input('name:')
-        if name != '':
-            client.user.name = name
-
-        await client.join_match()
-        await client.receive_and_send_loop()
-
-    asyncio.run(client_cli())

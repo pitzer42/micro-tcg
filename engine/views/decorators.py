@@ -75,22 +75,26 @@ def require_auth_web_socket(view):
     @extract_db
     @extract_socket
     async def wrapper(request, *args, db=None, socket=None, **kwargs):
-        json = await socket.receive_json()
-        token = json['token']
-        token = b_string_to_bytes(token)
-        user = await get_by_token(db, token)
-        if user is None:
+        try:
+            json = await socket.receive_json()
+            token = json['token']
+            token = b_string_to_bytes(token)
+            user = await get_by_token(db, token)
+            if user is None:
+                raise Exception('Unauthorized')
+            kwargs['user'] = user
+            kwargs['db'] = db
+            kwargs['socket'] = socket
+            return await view(
+                request,
+                *args,
+                **kwargs
+            )
+        except Exception as e:
+            print(e)
             await socket.send_json(dict(
-                message='unauthorized user_repo',
+                message='unauthorized',
                 status=401
             ))
             return socket
-        kwargs['user'] = user
-        kwargs['db'] = db
-        kwargs['socket'] = socket
-        return await view(
-            request,
-            *args,
-            **kwargs
-        )
     return wrapper

@@ -8,8 +8,13 @@ from aiohttp.test_utils import unittest_run_loop
 from engine.server import create_game_server
 
 from tests.engine_tests.mocks.db import create_test_db
-from tests.engine_tests.mocks.game.client import ChatClient
-from tests.engine_tests.mocks.game.game_loop import chat_loop
+from sample_games.chat import (
+    chat_loop,
+    ChatGamepad
+)
+
+# from tests.engine_tests.mocks.game.client import ChatClient
+# from tests.engine_tests.mocks.game.game_loop import chat_loop
 
 
 class ChatTestCase(AioHTTPTestCase):
@@ -41,7 +46,7 @@ class ChatTestCase(AioHTTPTestCase):
     def create_mock_clients(self, n_clients):
         clients = dict()
         for i in range(n_clients):
-            client: ChatTestCase = ChatClient(self.client)
+            client: ChatTestCase = ChatGamepad(self.client)
             client.user.name = str(i)
             clients[client.user.name] = client
         return clients
@@ -49,7 +54,7 @@ class ChatTestCase(AioHTTPTestCase):
     @staticmethod
     async def run_mock_clients(mocks: dict):
         return await asyncio.gather(
-            *[m.join_match() for m in mocks.values()]
+            *[m.start() for m in mocks.values()]
         )
 
     def assert_mocks_were_grouped_into_pairs(self, mocks: dict):

@@ -1,5 +1,5 @@
 from tests.engine_tests.mocks.db import create_test_db
-from tests.engine_tests.mocks.client import EngineClient
+from tests.engine_tests.mocks.client import TestGamepad
 
 from aiohttp.test_utils import AioHTTPTestCase
 
@@ -14,5 +14,4 @@ class EngineAPITestCase(AioHTTPTestCase):
         )
 
     async def setUpAsync(self) -> None:
-        self.use_case = EngineClient(self.client)
-        await self.use_case.register_user()
+        self.use_case = TestGamepad(self.client)
