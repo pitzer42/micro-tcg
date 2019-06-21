@@ -4,6 +4,7 @@ class ClientConnection:
         self._id = _id
         self.socket = socket
         self._disconnection_message = '%s is disconnected' % str(self._id)
+        self.group = None
 
     @property
     def is_connected(self):

@@ -5,8 +5,15 @@ class ConnectionGroup:
 
     __size_attr__ = 'size'
 
-    def __init__(self, clients):
-        self.clients = clients
+    def __init__(self, *args):
+        self.clients = list()
+        if len(args) == 1:
+            for client in args[0]:
+                self.add(client)
+
+    def add(self, item: ClientConnection):
+        item.group = self
+        self.clients.append(item)
 
     def __iter__(self):
         return iter(self.clients)

@@ -61,3 +61,8 @@ class TestConnectionGroup(unittest.TestCase):
         for _ in group:
             counter += 1
         self.assertEqual(counter, default_group_size)
+
+    def test_back_reference_from_client_connection_to_connection_group(self):
+        group = create_connection_group()
+        for client in group:
+            self.assertEqual(client.group, group)

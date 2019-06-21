@@ -67,6 +67,3 @@ class TestClientConnection(unittest.TestCase):
 
         socket.closed = False
         self.assertFalse(client.is_connected)
-
-
-

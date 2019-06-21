@@ -14,9 +14,17 @@ def create_aiohttp_app(
 
     new_app = web.Application()
 
-    new_app['db'] = db if db is not None else AsyncIOMotorClient().micro_tcg
-    new_app['waiting_list'] = waiting_list if waiting_list is not None else WaitingList(2)
-    new_app['game_loop'] = game_loop if game_loop is not None else default_game_loop
+    if db is None:
+        db = AsyncIOMotorClient().micro_tcg
+    new_app['db'] = db
+
+    if game_loop is None:
+        game_loop = default_game_loop
+    new_app['game_loop'] = game_loop
+
+    if waiting_list is None:
+        waiting_list = WaitingList(2)
+    new_app['waiting_list'] = waiting_list
 
     setup_routes(new_app)
 
