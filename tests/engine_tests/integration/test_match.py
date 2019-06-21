@@ -18,8 +18,8 @@ class TestMatch(MicroTcgApiTestCase):
     async def test_simultaneous_matches(self):
         await self.run_multi_client_test(10)
 
-    @unittest_run_loop
     @unittest.skip
+    @unittest_run_loop
     async def test_simultaneous_matches_stress(self):
         await self.run_multi_client_test(200)
 
