@@ -2,26 +2,26 @@ import asyncio
 
 from aiohttp import ClientSession
 
+from tests.engine_tests.unit.storage.user_repo import user_data
+
 from engine import routes
 from engine.models.user import User
 
-from tests.engine_tests.unit.storage.user_repo import user_data
 
-
-class MicroTCGClient:
+class EngineClient:
 
     def __init__(self, session: ClientSession):
         self.user = User(**user_data)
+        setattr(self.user, User.__id_attr__, None)
         self.base_url = ''
         self.session = session
-        self.opponent = None
+        self.clients_in_chat = None
         self.socket = None
 
-    async def setup(self):
+    async def join_match(self):
         await self.register_user()
         await self.login()
         await self.enter_waiting_list()
-        await self.receive_opponents()
 
     async def get_all_users(self):
         url = self.base_url + routes.users
@@ -70,11 +70,6 @@ class MicroTCGClient:
         await self.socket.send_json(doc)
         return await self.receive_and_print()
 
-    async def receive_opponents(self):
-        opponents = await self.receive_and_print()
-        self.opponent = opponents['message']
-        return opponents
-
     async def receive_and_send_loop(self):
         while True:
             await self.prompt_and_send()
@@ -99,9 +94,9 @@ class MicroTCGClient:
 if __name__ == '__main__':
 
     async def client_cli():
-        print('Micro-TCG')
+        print('Chat')
 
-        client = MicroTCGClient(
+        client = EngineClient(
             ClientSession()
         )
 
@@ -111,7 +106,7 @@ if __name__ == '__main__':
         if name != '':
             client.user.name = name
 
-        await client.setup()
+        await client.join_match()
         await client.receive_and_send_loop()
 
     asyncio.run(client_cli())

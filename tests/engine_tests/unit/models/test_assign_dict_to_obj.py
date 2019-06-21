@@ -15,14 +15,14 @@ dict_example_2 = dict(
 )
 
 
-class BaseExampleObject:
+class BaseExample:
 
     def __init__(self, *args, **kwargs):
         self.a = None
         self.b = None
 
 
-class SubExampleObject(BaseExampleObject):
+class SubExample(BaseExample):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
@@ -31,16 +31,15 @@ class SubExampleObject(BaseExampleObject):
 
 
 class TestAssignDictToObj(unittest.TestCase):
-    """ Unit engine_tests for engine_tests.models.assign_dict_to_obj """
 
     def test_assign_object_s_attributes_using_kwargs(self):
-        obj = BaseExampleObject()
+        obj = BaseExample()
         assign_dict_to_obj(obj, **dict_example)
         self.assertEqual(obj.a, dict_example['a'])
         self.assertEqual(obj.b, dict_example['b'])
 
     def test_assign_sub_object_s_attributes_using_kwargs(self):
-        obj = SubExampleObject()
+        obj = SubExample()
         assign_dict_to_obj(obj, **dict_example_2)
         self.assertEqual(obj.a, dict_example_2['a'])
         self.assertEqual(obj.b, dict_example_2['b'])
@@ -48,7 +47,7 @@ class TestAssignDictToObj(unittest.TestCase):
         self.assertEqual(obj.d, dict_example_2['d'])
 
     def test_assign_only_attrs_that_are_both_in_class_definition_and_in_kwargs(self):
-        obj = BaseExampleObject()
+        obj = BaseExample()
         assign_dict_to_obj(obj, **dict_example_2)
         self.assertEqual(obj.a, dict_example_2['a'])
         self.assertEqual(obj.b, dict_example_2['b'])

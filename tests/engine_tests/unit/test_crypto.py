@@ -1,4 +1,5 @@
 import unittest
+
 from engine.crypt import (
     encrypt,
     equals_to_encrypted
@@ -18,7 +19,6 @@ plain_values = [
 
 
 class TestEncrypt(unittest.TestCase):
-    """ Unit engine_tests for engine_tests.models.encrypt """
 
     def test_hash_is_different_from_plain_text(self):
         hashed = encrypt(plain_text)
@@ -37,10 +37,15 @@ class TestEncrypt(unittest.TestCase):
 
 
 class TestEqualsToEncrypted(unittest.TestCase):
-    """ Unit engine_tests for engine_tests.models.equals_to_encrypted """
 
     def test_compares_original_plain_value_to_hashed_value(self):
-        hashes = list(map(encrypt, plain_values))
+        hashes = list(
+            map(
+                encrypt,
+                plain_values
+            )
+        )
+
         try:
             for i in range(len(hashes)):
                 plain_value = plain_values[i]

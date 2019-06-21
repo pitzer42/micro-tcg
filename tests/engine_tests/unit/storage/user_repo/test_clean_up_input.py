@@ -1,42 +1,35 @@
 import unittest
-from engine.storage.user_repo import clean_up_input
 
-user_data = dict(
-    _id='123',
-    name='tester',
-    token='some_token',
-    password='secret_password'
+from tests.engine_tests.unit.storage.user_repo import (
+    user_data,
+    user_data_without_id
 )
 
-user_data_with_none_id = dict(
-    _id=None,
-    name='tester',
-    token='some_token',
-    password='secret_password'
-)
+from engine.models.user import User
+import engine.storage.user_repo as users
 
 
 class TestCleanUpInput(unittest.TestCase):
 
     def test_returns_a_dict(self):
-        clean_data = clean_up_input(user_data)
+        clean_data = users.clean_up_input(user_data)
         self.assertIsNotNone(clean_data)
         self.assertIsInstance(clean_data, dict)
 
     def test_does_not_change_input_parameter(self):
         copy = dict(user_data)
-        clean_up_input(copy)
+        users.clean_up_input(copy)
         self.assertEqual(user_data, copy)
 
-    def test_removes_id_if_it_is_none(self):
-        clean_data = clean_up_input(user_data_with_none_id)
-        self.assertNotIn('_id', clean_data)
+    def test_removes_none_id(self):
+        clean_data = users.clean_up_input(user_data_without_id)
+        self.assertNotIn(User.__id_attr__, clean_data)
 
-    def test_preserves_id_if_it_is_not_none(self):
-        clean_data = clean_up_input(user_data)
-        self.assertIn('_id', clean_data)
+    def test_preserves_not_none_id(self):
+        clean_data = users.clean_up_input(user_data)
+        self.assertIn(User.__id_attr__, clean_data)
 
     def test_encrypt_password(self):
-        clean_data = clean_up_input(user_data)
-        password = clean_data['password']
+        clean_data = users.clean_up_input(user_data)
+        password = clean_data[User.__password_attr__]
         self.assertIsInstance(password, bytes)

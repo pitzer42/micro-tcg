@@ -43,3 +43,8 @@ class ConnectionGroup:
                 self.clients
             )
         )
+
+    def but(self, one):
+        others = list(self.clients)
+        others.remove(one)
+        return others

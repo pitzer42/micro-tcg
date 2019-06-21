@@ -1,14 +1,15 @@
 import unittest
 
-from tests.engine_tests import run_async
-from tests.engine_tests.mocks.mock_socket import SocketMock
+from tests import run_async
+from tests.engine_tests.mocks.socket import SocketMock
 
 from engine.io.client_connection import ClientConnection
 
 
 class TestClientConnection(unittest.TestCase):
 
-    def test_equality_defined_by_id(self):
+    def test_equality_defined_by_type_and_id(self):
+
         class Dummy(object):
             def __init__(self, _id):
                 self._id = _id

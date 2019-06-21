@@ -1,30 +1,10 @@
 from aiohttp.test_utils import unittest_run_loop
 
 from engine import routes
-from tests.engine_tests.integration import MicroTcgApiTestCase
+from tests.engine_tests.integration.api import EngineAPITestCase
 
 
-class TestUsersAPI(MicroTcgApiTestCase):
-
-    @unittest_run_loop
-    async def test_get_users(self):
-        response = await self.use_case.get_all_users()
-        json_response = await response.json()
-
-        self.assertEqual(200, response.status)
-        self.assertIsNotNone(json_response)
-        self.assertGreater(len(json_response), 0)
-
-    @unittest_run_loop
-    async def test_put_user(self):
-        response = await self.use_case.register_user()
-        json_response = await response.json()
-
-        self.assertEqual(200, response.status)
-        self.assertIsNotNone(json_response)
-
-
-class TestAuthAPI(MicroTcgApiTestCase):
+class AuthAPITestCase(EngineAPITestCase):
 
     @unittest_run_loop
     async def test_successful_login(self):

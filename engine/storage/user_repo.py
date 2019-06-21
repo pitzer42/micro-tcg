@@ -48,7 +48,7 @@ async def list_all(db, limit=100):
     return users
 
 
-async def insert(db, user_data: dict) -> int:
+async def insert(db, user_data: dict):
     collection = get_collection(db)
     user_data = clean_up_input(user_data)
     result = await collection.insert_one(user_data)
