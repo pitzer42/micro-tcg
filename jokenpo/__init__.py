@@ -4,8 +4,8 @@ from engine.io.client_connection import ClientConnection
 from engine.io.connection_group import ConnectionGroup
 
 from engine.server import (
-    create_aiohttp_app,
-    run_aiohttp_app
+    create_game_server,
+    run_game_server
 )
 
 rules = {
@@ -51,5 +51,5 @@ async def jokenpo_loop(player: ClientConnection, all_players: ConnectionGroup):
 
 
 if __name__ == '__main__':
-    app = create_aiohttp_app(game_loop=jokenpo_loop)
-    run_aiohttp_app(app)
+    app = create_game_server(game_loop=jokenpo_loop)
+    run_game_server(app)

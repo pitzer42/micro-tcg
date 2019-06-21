@@ -4,14 +4,14 @@ from tests.engine_tests.mocks.mock_client import MicroTCGClient
 
 from aiohttp.test_utils import AioHTTPTestCase
 
-from engine.server import create_aiohttp_app
+from engine.server import create_game_server
 
 
 class MicroTcgApiTestCase(AioHTTPTestCase):
 
     async def get_application(self):
         """ create application with test database """
-        return create_aiohttp_app(
+        return create_game_server(
             db=await create_test_db(),
             game_loop=game_loop
         )

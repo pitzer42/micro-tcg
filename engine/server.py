@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from engine.models.waiting_list import WaitingList
 
 
-def create_aiohttp_app(
+def create_game_server(
         db=None,
         waiting_list=None,
         game_loop=None):
@@ -31,7 +31,7 @@ def create_aiohttp_app(
     return new_app
 
 
-def run_aiohttp_app(app, host='127.0.0.1', port=8080):
+def run_game_server(app, host='127.0.0.1', port=8080):
     return web.run_app(
         app,
         host=host,
