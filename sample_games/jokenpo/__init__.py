@@ -1,7 +1,6 @@
 import asyncio
 
 from engine.io.client_connection import ClientConnection
-from engine.io.connection_group import ConnectionGroup
 
 from engine.server import (
     create_game_server,
@@ -17,14 +16,14 @@ rules = {
 header = 'choose your move \n p - paper \n r - rock \n s - scissors'
 
 
-async def jokenpo_loop(player: ClientConnection, all_players: ConnectionGroup):
+async def jokenpo_loop(player: ClientConnection):
     # first player`s loop does the job. All others can wait.
     game_over = asyncio.Event()
-    if all_players.clients[0] != player:
+    if player.group.clients[0] != player:
         return await game_over.wait()
 
-    for a in all_players:
-        for b in all_players:
+    for a in player.group:
+        for b in player.group:
             if a != b:
 
                 move_a = ''

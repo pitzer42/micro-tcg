@@ -1,5 +1,8 @@
 from aiohttp import web
 
+import engine.storage.user_repo as users
+
+from engine.models.user import User
 from engine.controllers import auth_user
 
 from engine.views.decorators import (
@@ -8,19 +11,12 @@ from engine.views.decorators import (
     extract_json
 )
 
-from engine.models.user import User
-
-from engine.storage.user_repo import (
-    insert,
-    list_all
-)
-
 
 @extract_db
 @extract_json
 async def insert_one(request, db=None, json=None):
     try:
-        inserted_id = await insert(db, json)
+        inserted_id = await users.insert(db, json)
         response_data = dict(
             status=200,
             inserted_id=inserted_id
@@ -37,10 +33,10 @@ async def insert_one(request, db=None, json=None):
 @extract_db
 async def list_all(request, db=None):
     try:
-        users = await list_all(db, limit=100)
+        all_users = await users.list_all(db, limit=100)
         response_data = dict(
             status=200,
-            users=users
+            users=all_users
         )
         return web.json_response(response_data)
     except Exception as e:

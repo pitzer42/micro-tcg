@@ -25,16 +25,16 @@ class TestConnectionGroup(unittest.TestCase):
         group = create_group()
         message = dict(message='message')
         await group.broadcast(message)
-        for client in group.clients:
+        for client in group:
             self.assertIn(message, client.socket.sent_messages)
 
     @run_async
     async def test_multicast(self):
         group = create_group()
         message = dict(message='message')
-        emitter = group.clients[0]
+        emitter = group[0]
         await group.multicast(emitter, message)
-        for client in group.clients:
+        for client in group:
             if client == emitter:
                 self.assertNotIn(message, client.socket.sent_messages)
             else:
@@ -72,9 +72,9 @@ class TestConnectionGroup(unittest.TestCase):
 
     def test_list_all_clients_but_one(self):
         group = create_group()
-        one = group.clients[0]
-        expected_others = group.clients[1:]
-        others = group.but(one)
+        one = group[0]
+        expected_others = group[1:]
+        others = group.except_for(one)
 
         self.assertNotIn(one, others)
         self.assertListEqual(others, expected_others)

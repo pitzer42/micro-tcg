@@ -19,10 +19,16 @@ class Resource(object):
         return True
 
     def sum(self, other):
-        return self._combine(other, lambda a, b: a+b)
+        return self._combine(
+            other,
+            lambda a, b: a+b
+        )
 
     def sub(self, other):
-        return self._combine(other, lambda a, b: a-b)
+        return self._combine(
+            other,
+            lambda a, b: a-b
+        )
 
     def _combine(self, other, operation):
         combined = dict()

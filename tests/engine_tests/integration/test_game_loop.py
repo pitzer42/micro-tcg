@@ -36,7 +36,7 @@ class ChatTestCase(AioHTTPTestCase):
     @unittest.skip
     @unittest_run_loop
     async def test_simultaneous_loops_stress(self):
-        await self.run_multi_client_test(200)
+        await self.run_multi_client_test(100)
 
     async def run_multi_client_test(self, workload):
         mocks = self.create_mock_clients(workload)
@@ -61,4 +61,4 @@ class ChatTestCase(AioHTTPTestCase):
         for mock in mocks.values():
             other_key = mock.other_clients_in_chat
             mock_other: ChatTestCase = mocks[other_key]
-            self.assertEquals(mock_other.other_clients_in_chat, mock.user.name)
+            self.assertEqual(mock_other.other_clients_in_chat, mock.user.name)

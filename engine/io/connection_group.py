@@ -1,38 +1,29 @@
 from engine.io.client_connection import ClientConnection
 
 
-class ConnectionGroup:
-
-    __size_attr__ = 'size'
+class ConnectionGroup(list):
 
     def __init__(self, *args):
-        self.clients = list()
-        if len(args) == 1:
-            for client in args[0]:
-                self.add(client)
+        if len(args) == 1 and hasattr(args[0], '__iter__'):
+            for item in args[0]:
+                self.append(item)
 
-    def add(self, item: ClientConnection):
+    def append(self, item: ClientConnection):
+        if not isinstance(item, ClientConnection):
+            raise TypeError('ConnectionGroup only accept ClientConnection as members')
         item.group = self
-        self.clients.append(item)
-
-    def __iter__(self):
-        return iter(self.clients)
-
-    def __contains__(self, item):
-        if isinstance(item, ClientConnection):
-            return item in self.clients
-        return False
+        list.append(self, item)
 
     @property
     def size(self):
-        return len(self.clients)
+        return len(self)
 
     async def broadcast(self, message):
-        for client in self.clients:
+        for client in self:
             await client.send(message)
 
     async def multicast(self, emitter, message):
-        for client in self.clients:
+        for client in self:
             if client is not emitter:
                 await client.send(message)
 
@@ -40,11 +31,11 @@ class ConnectionGroup:
         return list(
             filter(
                 lambda client: client.is_connected,
-                self.clients
+                self
             )
         )
 
-    def but(self, one):
-        others = list(self.clients)
+    def except_for(self, one):
+        others = list(self)
         others.remove(one)
         return others

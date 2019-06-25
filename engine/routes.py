@@ -1,6 +1,6 @@
 from aiohttp.web import (
     get,
-    put
+    put,
 )
 
 from engine.views import (

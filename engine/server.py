@@ -1,3 +1,11 @@
+__db_key__ = 'db'
+__game_loop_key__ = 'game_loop'
+__waiting_list_key__ = 'waiting_list'
+
+__default_waiting_list_size__ = 2
+__default_host__ = '127.0.0.1'
+__default_port__ = 8080
+
 from aiohttp import web
 from engine.routes import setup_routes
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,22 +24,22 @@ def create_game_server(
 
     if db is None:
         db = AsyncIOMotorClient().micro_tcg
-    new_app['db'] = db
+    new_app[__db_key__] = db
 
     if game_loop is None:
         game_loop = default_game_loop
-    new_app['game_loop'] = game_loop
+    new_app[__game_loop_key__] = game_loop
 
     if waiting_list is None:
-        waiting_list = WaitingList(2)
-    new_app['waiting_list'] = waiting_list
+        waiting_list = WaitingList(__default_waiting_list_size__)
+    new_app[__waiting_list_key__] = waiting_list
 
     setup_routes(new_app)
 
     return new_app
 
 
-def run_game_server(app, host='127.0.0.1', port=8080):
+def run_game_server(app, host=__default_host__, port=__default_port__):
     return web.run_app(
         app,
         host=host,

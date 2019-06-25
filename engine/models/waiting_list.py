@@ -25,5 +25,5 @@ class WaitingList:
             group = ConnectionGroup()
             for i in range(self.limit):
                 client, event = self.w_list.pop()
-                group.add(client)
+                group.append(client)
                 event.set()
