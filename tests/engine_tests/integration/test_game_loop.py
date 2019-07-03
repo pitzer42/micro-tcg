@@ -13,9 +13,6 @@ from sample_games.chat import (
     ChatGamepad
 )
 
-# from tests.engine_tests.mocks.game.client import ChatClient
-# from tests.engine_tests.mocks.game.game_loop import chat_loop
-
 
 class ChatTestCase(AioHTTPTestCase):
 
