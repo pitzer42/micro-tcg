@@ -1,5 +1,5 @@
 from engine import routes
-from engine.io.gamepad import Gamepad
+from engine.client import Gamepad
 from engine.models.user import User
 
 

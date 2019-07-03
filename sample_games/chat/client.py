@@ -2,7 +2,7 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from engine.io.gamepad import Gamepad
+from engine.client import Gamepad
 
 
 if __name__ == '__main__':

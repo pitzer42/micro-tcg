@@ -1,5 +1,4 @@
-from engine.io.gamepad import Gamepad
-from engine.io.connection_group import ConnectionGroup
+from engine.client import Gamepad
 from engine.io.client_connection import ClientConnection
 
 

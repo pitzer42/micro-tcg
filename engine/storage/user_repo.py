@@ -73,6 +73,7 @@ async def replace_token(db, old_token, updated_token):
     return await collection.update_one(query, operation)
 
 
+# TODO: Adapters?
 def clean_up_output(user_data: dict) -> dict:
     clean_data = dict(user_data)
     # remove _id and password from the payload
@@ -82,7 +83,7 @@ def clean_up_output(user_data: dict) -> dict:
     clean_data[User.__token_attr__] = str(user_data[User.__token_attr__])
     return clean_data
 
-
+# TODO: Adapters?
 def clean_up_input(user_data: dict) -> dict:
     user_data = dict(user_data)
     password = user_data[User.__password_attr__]
