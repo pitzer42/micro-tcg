@@ -7,7 +7,8 @@ from aiohttp.test_utils import unittest_run_loop
 
 from engine.server import create_game_server
 
-from tests.engine_tests.mocks.db import create_test_db
+from tests.engine_tests.mocks.repositories import create_test_repositories
+
 from sample_games.chat import (
     chat_loop,
     ChatGamepad
@@ -18,7 +19,7 @@ class ChatTestCase(AioHTTPTestCase):
 
     async def get_application(self):
         return create_game_server(
-            db=await create_test_db(),
+            repositories=await create_test_repositories(),
             game_loop=chat_loop
         )
 

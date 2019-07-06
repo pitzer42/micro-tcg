@@ -9,5 +9,8 @@ def run_async(f):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         future = f(*args, **kwargs)
-        return loop.run_until_complete(future)
+        if loop.is_running():
+            return loop.create_task(future)
+        else:
+            return loop.run_until_complete(future)
     return wrapper

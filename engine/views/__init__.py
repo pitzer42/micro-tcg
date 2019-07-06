@@ -2,7 +2,7 @@ from aiohttp.web import json_response
 
 __socket_key__ = 'socket'
 __json_key__ = 'json'
-__db_key__ = 'db'
+__repositories_key__ = 'repositories'
 __waiting_list_key__ = 'waiting_list'
 __game_loop_key__ = 'game_loop'
 __token_key__ = 'token'

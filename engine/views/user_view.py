@@ -1,4 +1,3 @@
-import engine.storage.user_repo as users
 
 from engine.models.user import User
 from engine.controllers import auth_user
@@ -7,16 +6,16 @@ from engine.views import unauthorized, send_json
 
 from engine.views.decorators import (
     require_auth,
-    require_db,
+    require_repositories,
     require_json
 )
 
 
-@require_db
+@require_repositories
 @require_json
-async def insert_one(request, db=None, json=None, **kwargs):
+async def insert_one(request, json=None, repositories=None, **kwargs):
     try:
-        inserted_id = await users.insert(db, json)
+        inserted_id = await repositories.users.insert(json)
         response_data = dict(
             status=200,
             inserted_id=inserted_id
@@ -30,10 +29,10 @@ async def insert_one(request, db=None, json=None, **kwargs):
         return await send_json(response_data, **kwargs)
 
 
-@require_db
-async def list_all(request, db=None, **kwargs):
+@require_repositories
+async def list_all(request, repositories=None, **kwargs):
     try:
-        all_users = await users.list_all(db, limit=100)
+        all_users = await repositories.users.all(limit=100)
         response_data = dict(
             status=200,
             users=all_users
@@ -47,12 +46,12 @@ async def list_all(request, db=None, **kwargs):
         return await send_json(response_data, **kwargs)
 
 
-@require_db
 @require_json
-async def login(request, db=None, json=None, **kwargs):
+@require_repositories
+async def login(request, json=None, repositories=None, **kwargs):
     name = json[User.__name_attr__]
     password = json[User.__password_attr__]
-    token = await auth_user.login(db, name, password)
+    token = await auth_user.login(repositories.users, name, password)
     if token is None:
         return await unauthorized(request)
     token = str(token)

@@ -3,15 +3,15 @@ from aiohttp import web
 from engine.controllers.auth_user import validate_token
 
 from engine.views import (
+    read_json,
     unauthorized,
     __socket_key__,
     __json_key__,
-    __db_key__,
+    __repositories_key__,
     __waiting_list_key__,
     __game_loop_key__,
     __token_key__,
-    __user_key__,
-    read_json
+    __user_key__
 )
 
 
@@ -31,9 +31,9 @@ def require_json(view):
     return wrapper
 
 
-def require_db(view):
+def require_repositories(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs[__db_key__] = request.app[__db_key__]
+        kwargs[__repositories_key__] = request.app[__repositories_key__]
         return await view(request, *args, **kwargs)
     return wrapper
 
@@ -54,10 +54,11 @@ def require_game_loop(view):
 
 def require_auth(view):
     """ invokes decorated function if the user_repo is authenticated. 401 otherwise. """
-    @require_db
+
     @require_json
-    async def wrapper(request, *args, db=None, json=None, **kwargs):
-        kwargs[__db_key__] = db
+    @require_repositories
+    async def wrapper(request, *args, json=None, repositories=None, **kwargs):
+        kwargs[__repositories_key__] = repositories
         kwargs[__json_key__] = json
 
         token = json.get(__token_key__)
@@ -65,7 +66,7 @@ def require_auth(view):
             return await unauthorized(request, *args, **kwargs)
 
         token = b_string_to_bytes(token)
-        authenticated_user = await validate_token(db, token)
+        authenticated_user = await validate_token(repositories.users, token)
         if not authenticated_user:
             return await unauthorized(request, *args, **kwargs)
 

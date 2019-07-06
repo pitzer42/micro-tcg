@@ -1,7 +1,7 @@
 import time
 
 from engine.models.user import User
-from engine.storage import user_repo as users
+from engine.repos.users import Users
 
 from engine.crypt import (
     encrypt,
@@ -9,8 +9,8 @@ from engine.crypt import (
 )
 
 
-async def login(db, name: str, password: str):
-    user_data = await users.get_by_name(db, name)
+async def login(users: Users, name: str, password: str):
+    user_data = await users.get_by_name(name)
     if user_data is None:
         return
     password_hash = user_data[User.__password_attr__]
@@ -19,17 +19,17 @@ async def login(db, name: str, password: str):
     user_id = user_data[User.__id_attr__]
     token = get_timestamp() + str(user_id)
     token = encrypt(token)
-    await users.set_token(db, user_id, token)
+    await users.set_token(user_id, token)
     return token
 
 
-async def validate_token(db, token):
-    user = await users.get_by_token(db, token)
+async def validate_token(users: Users, token):
+    user = await users.get_by_token(token)
     return user
 
 
-async def logout(db, token):
-    await users.replace_token(db, token, None)
+async def logout(users: Users, token):
+    await users.replace_token(token, None)
 
 
 def get_timestamp() -> str:
