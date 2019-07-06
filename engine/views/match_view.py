@@ -5,15 +5,17 @@ from engine.io.client_connection import ClientConnection
 from engine.models.user import User
 
 from engine.views.decorators import (
-    require_auth_web_socket,
-    extract_waiting_list,
-    extract_game_loop
+    require_auth,
+    require_waiting_list,
+    require_game_loop,
+    web_socket_view
 )
 
 
-@extract_waiting_list
-@extract_game_loop
-@require_auth_web_socket
+@web_socket_view
+@require_waiting_list
+@require_game_loop
+@require_auth
 async def enter_waiting_list(request,
                              *args,
                              socket=None,

@@ -59,14 +59,17 @@ class AuthAPITestCase(EngineAPITestCase):
     @unittest_run_loop
     async def test_unsuccessful_access_to_protected_view(self):
         await self.use_case.login_with_wrong_password()
-        doc = dict(
-            token=self.use_case.user.token
-        )
+
+        doc = dict(token=self.use_case.user.token)
         response = await self.client.get(
             routes.secret,
             json=doc
         )
-        self.assertEqual(401, response.status)
+
+        json_response = await response.json()
+
+        self.assertIn('status', json_response)
+        self.assertEqual(json_response['status'], 401)
 
     @unittest_run_loop
     async def test_entering_waiting_list(self):

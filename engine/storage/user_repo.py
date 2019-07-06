@@ -83,6 +83,7 @@ def clean_up_output(user_data: dict) -> dict:
     clean_data[User.__token_attr__] = str(user_data[User.__token_attr__])
     return clean_data
 
+
 # TODO: Adapters?
 def clean_up_input(user_data: dict) -> dict:
     user_data = dict(user_data)

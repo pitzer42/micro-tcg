@@ -25,7 +25,7 @@ async def login(db, name: str, password: str):
 
 async def validate_token(db, token):
     user = await users.get_by_token(db, token)
-    return user is not None
+    return user
 
 
 async def logout(db, token):

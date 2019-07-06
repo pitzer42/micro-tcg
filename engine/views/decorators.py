@@ -1,6 +1,8 @@
 from aiohttp import web
 
-from engine.storage.user_repo import get_by_token
+from engine.views import unauthorized, __socket_key__, __json_key__, __db_key__, __waiting_list_key__, \
+    __game_loop_key__, __token_key__, __user_key__
+from engine.controllers.auth_user import validate_token
 
 
 def b_string_to_bytes(b_str: str) -> bytes:
@@ -8,93 +10,69 @@ def b_string_to_bytes(b_str: str) -> bytes:
     return b_str[2:-1].encode()
 
 
-def extract_json(view):
+def require_json(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs['json'] = await request.json()
+        if __socket_key__ in kwargs:
+            socket = kwargs[__socket_key__]
+            kwargs[__json_key__] = await socket.receive_json()
+        else:
+            kwargs[__json_key__] = await request.json()
         return await view(request, *args, **kwargs)
     return wrapper
 
 
-def extract_db(view):
+def require_db(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs['db'] = request.app['db']
+        kwargs[__db_key__] = request.app[__db_key__]
         return await view(request, *args, **kwargs)
     return wrapper
 
 
-def extract_socket(view):
+def require_waiting_list(view):
+    async def wrapper(request, *args, **kwargs):
+        kwargs[__waiting_list_key__] = request.app[__waiting_list_key__]
+        return await view(request, *args, **kwargs)
+    return wrapper
+
+
+def require_game_loop(view):
+    async def wrapper(request, *args, **kwargs):
+        kwargs[__game_loop_key__] = request.app[__game_loop_key__]
+        return await view(request, *args, **kwargs)
+    return wrapper
+
+
+def web_socket_view(view):
     async def wrapper(request, *args, **kwargs):
         socket = web.WebSocketResponse()
         await socket.prepare(request)
-        kwargs['socket'] = socket
-        return await view(request, *args, **kwargs)
-    return wrapper
-
-
-def extract_waiting_list(view):
-    async def wrapper(request, *args, **kwargs):
-        kwargs['waiting_list'] = request.app['waiting_list']
-        return await view(request, *args, **kwargs)
-    return wrapper
-
-
-def extract_game_loop(view):
-    async def wrapper(request, *args, **kwargs):
-        kwargs['game_loop'] = request.app['game_loop']
+        kwargs[__socket_key__] = socket
         return await view(request, *args, **kwargs)
     return wrapper
 
 
 def require_auth(view):
     """ invokes decorated function if the user_repo is authenticated. 401 otherwise. """
-    @extract_db
-    @extract_json
+    @require_db
+    @require_json
     async def wrapper(request, *args, db=None, json=None, **kwargs):
-        try:
-            token = json['token']
-            token = b_string_to_bytes(token)
-            user = await get_by_token(db, token)
-            if user is None:
-                raise
-            kwargs['user_repo'] = user
-            kwargs['db'] = db
-            kwargs['json'] = json
-            return await view(
-                request,
-                *args,
-                **kwargs
-            )
-        except Exception as e:
-            print(e)
-            return web.json_response('unauthorized user_repo', status=401)
-    return wrapper
+        kwargs[__db_key__] = db
+        kwargs[__json_key__] = json
 
+        token = json.get(__token_key__)
+        if not token:
+            return await unauthorized(request, *args, **kwargs)
 
-def require_auth_web_socket(view):
-    """ invokes decorated function if the user_repo is authenticated. json informing 401 otherwise. """
-    @extract_db
-    @extract_socket
-    async def wrapper(request, *args, db=None, socket=None, **kwargs):
-        try:
-            json = await socket.receive_json()
-            token = json['token']
-            token = b_string_to_bytes(token)
-            user = await get_by_token(db, token)
-            if user is None:
-                raise Exception('Unauthorized')
-            kwargs['user'] = user
-            kwargs['db'] = db
-            kwargs['socket'] = socket
-            return await view(
-                request,
-                *args,
-                **kwargs
-            )
-        except Exception as e:
-            print(e)
-            await socket.send_json(dict(
-                message='unauthorized',
-                status=401
-            ))
-            return socket
+        token = b_string_to_bytes(token)
+        authenticated_user = await validate_token(db, token)
+        if not authenticated_user:
+            return await unauthorized(request, *args, **kwargs)
+
+        kwargs[__user_key__] = authenticated_user
+        return await view(
+            request,
+            *args,
+            **kwargs
+        )
+
     return wrapper

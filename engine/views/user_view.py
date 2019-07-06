@@ -5,15 +5,17 @@ import engine.storage.user_repo as users
 from engine.models.user import User
 from engine.controllers import auth_user
 
+from engine.views import unauthorized
+
 from engine.views.decorators import (
     require_auth,
-    extract_db,
-    extract_json
+    require_db,
+    require_json
 )
 
 
-@extract_db
-@extract_json
+@require_db
+@require_json
 async def insert_one(request, db=None, json=None):
     try:
         inserted_id = await users.insert(db, json)
@@ -30,7 +32,7 @@ async def insert_one(request, db=None, json=None):
         return web.json_response(response_data)
 
 
-@extract_db
+@require_db
 async def list_all(request, db=None):
     try:
         all_users = await users.list_all(db, limit=100)
@@ -47,18 +49,14 @@ async def list_all(request, db=None):
         return web.json_response(response_data)
 
 
-@extract_db
-@extract_json
+@require_db
+@require_json
 async def login(request, db=None, json=None):
     name = json[User.__name_attr__]
     password = json[User.__password_attr__]
     token = await auth_user.login(db, name, password)
     if token is None:
-        response_data = dict(
-            message='Wrong credentials',
-            status=401
-        )
-        return web.json_response(response_data)
+        return await unauthorized(request)
     token = str(token)
     response_data = dict(token=token)
     return web.json_response(response_data)
