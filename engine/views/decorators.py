@@ -1,7 +1,17 @@
 from aiohttp import web
 
-from engine.views import unauthorized, __socket_key__, __json_key__, __db_key__, __waiting_list_key__, \
-    __game_loop_key__, __token_key__, __user_key__
+from engine.views import (
+    unauthorized,
+    __socket_key__,
+    __json_key__,
+    __db_key__,
+    __waiting_list_key__,
+    __game_loop_key__,
+    __token_key__,
+    __user_key__,
+    read_json
+)
+
 from engine.controllers.auth_user import validate_token
 
 
@@ -12,11 +22,7 @@ def b_string_to_bytes(b_str: str) -> bytes:
 
 def require_json(view):
     async def wrapper(request, *args, **kwargs):
-        if __socket_key__ in kwargs:
-            socket = kwargs[__socket_key__]
-            kwargs[__json_key__] = await socket.receive_json()
-        else:
-            kwargs[__json_key__] = await request.json()
+        kwargs[__json_key__] = await read_json(request, *args, **kwargs)
         return await view(request, *args, **kwargs)
     return wrapper
 

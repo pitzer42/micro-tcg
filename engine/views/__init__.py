@@ -9,16 +9,25 @@ __token_key__ = 'token'
 __user_key__ = 'user'
 
 
-async def unauthorized(request, *args, **kwargs):
+async def read_json(request, *args, **kwargs):
+    if __socket_key__ in kwargs:
+        socket = kwargs[__socket_key__]
+        return await socket.receive_json()
+    return await request.json()
+
+
+async def send_json(data: dict, *args, **kwargs):
+    if __socket_key__ in kwargs:
+        socket = kwargs[__socket_key__]
+        await socket.send_json(data)
+        return socket
+    return json_response(data)
+
+
+async def unauthorized(*args, **kwargs):
     response = dict(
         message='unauthorized',
         status=401
     )
-
-    if __socket_key__ in kwargs:
-        socket = kwargs[__socket_key__]
-        await socket.send_json(response)
-        return socket
-    return json_response(response)
-
+    return await send_json(response, *args, **kwargs)
 
