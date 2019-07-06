@@ -1,5 +1,7 @@
 from aiohttp import web
 
+from engine.controllers.auth_user import validate_token
+
 from engine.views import (
     unauthorized,
     __socket_key__,
@@ -12,12 +14,14 @@ from engine.views import (
     read_json
 )
 
-from engine.controllers.auth_user import validate_token
 
-
-def b_string_to_bytes(b_str: str) -> bytes:
-    """ converts a string containing a bytes literal (ex: 'b"something"') to bytes. """
-    return b_str[2:-1].encode()
+def require_socket(view):
+    async def wrapper(request, *args, **kwargs):
+        socket = web.WebSocketResponse()
+        await socket.prepare(request)
+        kwargs[__socket_key__] = socket
+        return await view(request, *args, **kwargs)
+    return wrapper
 
 
 def require_json(view):
@@ -48,15 +52,6 @@ def require_game_loop(view):
     return wrapper
 
 
-def web_socket_view(view):
-    async def wrapper(request, *args, **kwargs):
-        socket = web.WebSocketResponse()
-        await socket.prepare(request)
-        kwargs[__socket_key__] = socket
-        return await view(request, *args, **kwargs)
-    return wrapper
-
-
 def require_auth(view):
     """ invokes decorated function if the user_repo is authenticated. 401 otherwise. """
     @require_db
@@ -82,3 +77,8 @@ def require_auth(view):
         )
 
     return wrapper
+
+
+def b_string_to_bytes(b_str: str) -> bytes:
+    """ converts a string containing a bytes literal (ex: 'b"something"') to bytes. """
+    return b_str[2:-1].encode()

@@ -8,22 +8,20 @@ from engine.views.decorators import (
     require_auth,
     require_waiting_list,
     require_game_loop,
-    web_socket_view
+    require_socket
 )
 
 
-@web_socket_view
+@require_socket
 @require_waiting_list
 @require_game_loop
 @require_auth
-async def enter_waiting_list(request,
-                             *args,
+async def enter_waiting_list(*args,
                              socket=None,
                              user=None,
                              waiting_list=None,
                              game_loop=None,
-                             **kwargs
-                             ):
+                             **kwargs):
     try:
         user_name = user[User.__name_attr__]
         client = ClientConnection(user_name, socket)
