@@ -10,8 +10,9 @@ def clean_up_output(user_data: dict) -> dict:
     # remove _id and password from the payload
     del clean_data[User.__id_attr__]
     del clean_data[User.__password_attr__]
-    # convert binary into string for easier json encoding
-    clean_data[User.__token_attr__] = str(user_data[User.__token_attr__])
+    # convert binary into string for json encoding
+    if User.__token_attr__ in clean_data:
+        clean_data[User.__token_attr__] = str(user_data[User.__token_attr__])
     return clean_data
 
 

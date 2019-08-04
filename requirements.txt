@@ -1,3 +1,4 @@
+aiohttp_cors
 aiohttp==3.5.4
 astroid==2.2.5
 async-timeout==3.0.1

@@ -2,7 +2,7 @@ import asyncio
 
 from aiohttp import ClientSession
 
-from engine import routes
+from engine import resources
 from engine.models.user import User
 
 
@@ -31,7 +31,7 @@ class Gamepad:
         await self.enter_waiting_list()
 
     async def register_user(self):
-        url = self.base_url + routes.users
+        url = self.base_url + resources.users.path
         doc = self.user.__dict__
         return await self.session.put(
             url,
@@ -39,7 +39,7 @@ class Gamepad:
         )
 
     async def login(self):
-        url = self.base_url + routes.login
+        url = self.base_url + resources.login.path
         doc = self.user.__dict__
         response = await self.session.get(
             url,
@@ -50,7 +50,7 @@ class Gamepad:
         return response
 
     async def enter_waiting_list(self):
-        url = self.base_url + routes.waiting_list
+        url = self.base_url + resources.waiting_list.path
         self.socket = await self.session.ws_connect(url)
         doc = dict(
             token=self.user.token
@@ -59,7 +59,7 @@ class Gamepad:
         return await self.receive_and_print()
 
     async def get_all_users(self):
-        url = self.base_url + routes.users
+        url = self.base_url + resources.users
         return await self.session.get(url)
 
     async def receive_and_send_loop(self):

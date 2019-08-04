@@ -2,7 +2,7 @@ from aiohttp.test_utils import unittest_run_loop
 
 from tests.engine_tests.integration.api import EngineAPITestCase
 
-from engine import routes
+from engine import resources
 
 
 class AuthAPITestCase(EngineAPITestCase):
@@ -51,7 +51,7 @@ class AuthAPITestCase(EngineAPITestCase):
             token=self.use_case.user.token
         )
         response = await self.client.get(
-            routes.secret,
+            resources.secret.path,
             json=doc
         )
         self.assertEqual(200, response.status)
@@ -62,7 +62,7 @@ class AuthAPITestCase(EngineAPITestCase):
 
         doc = dict(token=self.use_case.user.token)
         response = await self.client.get(
-            routes.secret,
+            resources.secret.path,
             json=doc
         )
 

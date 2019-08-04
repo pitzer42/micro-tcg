@@ -18,7 +18,7 @@ async def insert_one(request, json=None, repositories=None, **kwargs):
         inserted_id = await repositories.users.insert(json)
         response_data = dict(
             status=200,
-            inserted_id=inserted_id
+            inserted_id=str(inserted_id)
         )
         return await send_json(response_data, **kwargs)
     except Exception as e:

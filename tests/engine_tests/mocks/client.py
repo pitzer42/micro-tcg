@@ -1,4 +1,4 @@
-from engine import routes
+from engine import resources
 from engine.client import Gamepad
 from engine.models.user import User
 
@@ -6,11 +6,11 @@ from engine.models.user import User
 class TestGamepad(Gamepad):
 
     async def get_all_users(self):
-        url = self.base_url + routes.users
+        url = self.base_url + resources.users.path
         return await self.session.get(url)
 
     async def login(self, expect_success=True):
-        url = self.base_url + routes.login
+        url = self.base_url + resources.login.path
         doc = self.user.__dict__
         response = await self.session.get(
             url,

@@ -1,7 +1,7 @@
 from aiohttp import web
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from engine.routes import setup_routes
+from engine.resources import setup_routes
 from engine.storage.mongo import MongoRepositories
 from engine.models.waiting_list import WaitingList
 
