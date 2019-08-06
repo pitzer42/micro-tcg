@@ -8,20 +8,20 @@ from abc import abstractmethod
 def clean_up_output(user_data: dict) -> dict:
     clean_data = dict(user_data)
     # remove _id and password from the payload
-    del clean_data[User.__id_attr__]
-    del clean_data[User.__password_attr__]
+    del clean_data[User._id_attr]
+    del clean_data[User._password_attr]
     # convert binary into string for json encoding
-    if User.__token_attr__ in clean_data:
-        clean_data[User.__token_attr__] = str(user_data[User.__token_attr__])
+    if User._token_attr in clean_data:
+        clean_data[User._token_attr] = str(user_data[User._token_attr])
     return clean_data
 
 
 def clean_up_input(user_data: dict) -> dict:
     user_data = dict(user_data)
-    password = user_data[User.__password_attr__]
-    user_data[User.__password_attr__] = encrypt(password)
-    if User.__id_attr__ in user_data and user_data[User.__id_attr__] is None:
-        del user_data[User.__id_attr__]
+    password = user_data[User._password_attr]
+    user_data[User._password_attr] = encrypt(password)
+    if User._id_attr in user_data and user_data[User._id_attr] is None:
+        del user_data[User._id_attr]
     return user_data
 
 

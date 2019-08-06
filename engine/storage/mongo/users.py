@@ -28,37 +28,37 @@ class MongoUsers(Users):
 
     async def get_by_id(self, user_id: str) -> User:
         return await self.collection.find_one({
-            User.__id_attr__: user_id
+            User._id_attr: user_id
         })
 
     async def get_by_name(self, name: str) -> User:
         return await self.collection.find_one({
-            User.__name_attr__: name
+            User._name_attr: name
         })
 
     async def get_by_token(self, token) -> User:
         return await self.collection.find_one({
-            User.__token_attr__: token
+            User._token_attr: token
         })
 
     async def set_token(self, user_id: int, token) -> NoReturn:
         query = {
-            User.__id_attr__: user_id
+            User._id_attr: user_id
         }
         update = {
             '$set': {
-                User.__token_attr__: token
+                User._token_attr: token
             }
         }
         return await self.collection.update_one(query, update)
 
     async def replace_token(self, old_token, new_token) -> NoReturn:
         query = {
-            User.__token_attr__: old_token
+            User._token_attr: old_token
         }
         update = {
             '$set': {
-                User.__token_attr__: new_token
+                User._token_attr: new_token
             }
         }
         return await self.collection.update_one(query, update)

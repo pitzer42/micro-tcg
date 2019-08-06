@@ -1,17 +1,19 @@
 from aiohttp import web
 
+from json.decoder import JSONDecodeError
+
 from engine.controllers.auth_user import validate_token
 
 from engine.views import (
     read_json,
     unauthorized,
-    __socket_key__,
-    __json_key__,
-    __repositories_key__,
-    __waiting_list_key__,
-    __game_loop_key__,
-    __token_key__,
-    __user_key__
+    SOCKET_KEY,
+    JSON_KEY,
+    REPOSITORIES_KEY,
+    WAITING_LIST_KEY,
+    GAME_LOOP_KEY,
+    TOKEN_KEY,
+    USER_KEY
 )
 
 
@@ -19,35 +21,38 @@ def require_socket(view):
     async def wrapper(request, *args, **kwargs):
         socket = web.WebSocketResponse()
         await socket.prepare(request)
-        kwargs[__socket_key__] = socket
+        kwargs[SOCKET_KEY] = socket
         return await view(request, *args, **kwargs)
     return wrapper
 
 
 def require_json(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs[__json_key__] = await read_json(request, *args, **kwargs)
+        try:
+            kwargs[JSON_KEY] = await read_json(request, *args, **kwargs)
+        except JSONDecodeError:
+            kwargs[JSON_KEY] = None
         return await view(request, *args, **kwargs)
     return wrapper
 
 
 def require_repositories(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs[__repositories_key__] = request.app[__repositories_key__]
+        kwargs[REPOSITORIES_KEY] = request.app[REPOSITORIES_KEY]
         return await view(request, *args, **kwargs)
     return wrapper
 
 
 def require_waiting_list(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs[__waiting_list_key__] = request.app[__waiting_list_key__]
+        kwargs[WAITING_LIST_KEY] = request.app[WAITING_LIST_KEY]
         return await view(request, *args, **kwargs)
     return wrapper
 
 
 def require_game_loop(view):
     async def wrapper(request, *args, **kwargs):
-        kwargs[__game_loop_key__] = request.app[__game_loop_key__]
+        kwargs[GAME_LOOP_KEY] = request.app[GAME_LOOP_KEY]
         return await view(request, *args, **kwargs)
     return wrapper
 
@@ -58,10 +63,10 @@ def require_auth(view):
     @require_json
     @require_repositories
     async def wrapper(request, *args, json=None, repositories=None, **kwargs):
-        kwargs[__repositories_key__] = repositories
-        kwargs[__json_key__] = json
+        kwargs[REPOSITORIES_KEY] = repositories
+        kwargs[JSON_KEY] = json
 
-        token = json.get(__token_key__)
+        token = json.get(TOKEN_KEY)
         if not token:
             return await unauthorized(request, *args, **kwargs)
 
@@ -70,7 +75,7 @@ def require_auth(view):
         if not authenticated_user:
             return await unauthorized(request, *args, **kwargs)
 
-        kwargs[__user_key__] = authenticated_user
+        kwargs[USER_KEY] = authenticated_user
         return await view(
             request,
             *args,

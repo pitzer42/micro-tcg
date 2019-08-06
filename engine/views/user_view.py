@@ -45,12 +45,17 @@ async def list_all(request, repositories=None, **kwargs):
         )
         return await send_json(response_data, **kwargs)
 
-
 @require_json
 @require_repositories
 async def login(request, json=None, repositories=None, **kwargs):
-    name = json[User.__name_attr__]
-    password = json[User.__password_attr__]
+    if None in (json, repositories):
+        return await unauthorized(request)
+    if User._name_attr not in json:
+        return await unauthorized(request)
+    name = json[User._name_attr]
+    if User._password_attr not in json:
+        return await unauthorized(request)
+    password = json[User._password_attr]
     token = await auth_user.login(repositories.users, name, password)
     if token is None:
         return await unauthorized(request)

@@ -22,14 +22,14 @@ class TestCleanUpOutput(unittest.TestCase):
 
     def test_removes_id(self):
         clean_data = clean_up_output(user_data)
-        self.assertNotIn(User.__id_attr__, clean_data)
+        self.assertNotIn(User._id_attr, clean_data)
 
     def test_removes_password(self):
         clean_data = clean_up_output(user_data)
-        self.assertNotIn(User.__password_attr__, clean_data)
+        self.assertNotIn(User._password_attr, clean_data)
 
     def test_token_is_string(self):
         clean_data = clean_up_output(user_data)
-        token = clean_data[User.__token_attr__]
+        token = clean_data[User._token_attr]
         self.assertIsInstance(token, str)
 

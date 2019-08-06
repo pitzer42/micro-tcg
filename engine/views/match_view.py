@@ -23,7 +23,7 @@ async def enter_waiting_list(*args,
                              game_loop=None,
                              **kwargs):
     try:
-        user_name = user[User.__name_attr__]
+        user_name = user[User._name_attr]
         client = ClientConnection(user_name, socket)
         ack = dict(
             message='you are now in the waiting list',

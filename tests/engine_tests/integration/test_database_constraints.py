@@ -13,12 +13,12 @@ class TestRepositoryConstraints(TestUsers):
         clean_password = 'plain_text'
         wrong_password = 'this_is_the_wrong_password'
         user_data = {
-            User.__password_attr__: clean_password
+            User._password_attr: clean_password
         }
 
         inserted_id = await self.users.insert(user_data)
         saved_user = await self.users.get_by_id(inserted_id)
-        hashed_password = saved_user[User.__password_attr__]
+        hashed_password = saved_user[User._password_attr]
 
         expected_true = equals_to_encrypted(clean_password, hashed_password)
         expected_false = equals_to_encrypted(wrong_password, hashed_password)

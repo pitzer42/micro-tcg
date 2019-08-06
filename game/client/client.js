@@ -1,0 +1,44 @@
+
+
+credentials = {
+    name: 'html_client',
+    password: '123'
+}
+
+function insertUser(){
+    request = new XMLHttpRequest()
+
+    request.open('PUT', 'http://127.0.0.1:8080/users')
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    request.send(JSON.stringify(credentials))
+
+    request.onload = function() {
+      if (request.status != 200) {
+        alert(`Error ${request.status}: ${request.statusText}`)
+      } else {
+        response_json = JSON.parse(request.response)
+        console.log(response_json)
+      }
+    }
+}
+
+function login(){
+    request = new XMLHttpRequest()
+    request.open('GET', 'http://127.0.0.1:8080/login')
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    request.send(JSON.stringify(credentials))
+
+    request.onload = function() {
+      if (request.status != 200) {
+        alert(`Error ${request.status}: ${request.statusText}`)
+      } else {
+        response_json = JSON.parse(request.response)
+        console.log(response_json)
+      }
+    }
+}
+
+login()
+
+
+// socket = new WebSocket('ws://127.0.0.1/waiting_list')

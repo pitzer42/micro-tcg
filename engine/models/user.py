@@ -3,14 +3,14 @@ from engine.models import assign_dict_to_obj
 
 class User:
 
-    __id_attr__ = '_id'
-    __name_attr__ = 'name'
-    __token_attr__ = 'token'
-    __password_attr__ = 'password'
+    _id_attr = '_id'
+    _name_attr = 'name'
+    _token_attr = 'token'
+    _password_attr = 'password'
 
     def __init__(self, **kwargs):
-        setattr(self, User.__id_attr__, None)
-        setattr(self, User.__name_attr__, None)
-        setattr(self, User.__password_attr__, None)
-        setattr(self, User.__token_attr__, None)
+        setattr(self, User._id_attr, None)
+        setattr(self, User._name_attr, None)
+        setattr(self, User._password_attr, None)
+        setattr(self, User._token_attr, None)
         assign_dict_to_obj(self, **kwargs)

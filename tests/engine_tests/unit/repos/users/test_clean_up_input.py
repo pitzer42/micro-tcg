@@ -23,13 +23,13 @@ class TestCleanUpInput(unittest.TestCase):
 
     def test_removes_none_id(self):
         clean_data = clean_up_input(user_data_without_id)
-        self.assertNotIn(User.__id_attr__, clean_data)
+        self.assertNotIn(User._id_attr, clean_data)
 
     def test_preserves_not_none_id(self):
         clean_data = clean_up_input(user_data)
-        self.assertIn(User.__id_attr__, clean_data)
+        self.assertIn(User._id_attr, clean_data)
 
     def test_encrypt_password(self):
         clean_data = clean_up_input(user_data)
-        password = clean_data[User.__password_attr__]
+        password = clean_data[User._password_attr]
         self.assertIsInstance(password, bytes)

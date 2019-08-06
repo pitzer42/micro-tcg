@@ -16,8 +16,8 @@ class Gamepad:
 
         def generate_user() -> User:
             return User(**{
-                User.__name_attr__: str(id(self)),
-                User.__password_attr__: str(id(self)),
+                User._name_attr: str(id(self)),
+                User._password_attr: str(id(self)),
             })
 
         self.session: ClientSession = session
@@ -46,7 +46,7 @@ class Gamepad:
             json=doc
         )
         response_json = await response.json()
-        self.user.token = response_json[User.__token_attr__]
+        self.user.token = response_json[User._token_attr]
         return response
 
     async def enter_waiting_list(self):

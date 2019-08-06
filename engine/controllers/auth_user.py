@@ -13,10 +13,10 @@ async def login(users: Users, name: str, password: str):
     user_data = await users.get_by_name(name)
     if user_data is None:
         return
-    password_hash = user_data[User.__password_attr__]
+    password_hash = user_data[User._password_attr]
     if not equals_to_encrypted(password, password_hash):
         return
-    user_id = user_data[User.__id_attr__]
+    user_id = user_data[User._id_attr]
     token = get_timestamp() + str(user_id)
     token = encrypt(token)
     await users.set_token(user_id, token)

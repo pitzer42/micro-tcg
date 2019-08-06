@@ -12,5 +12,5 @@ class TestUsers(TestRepositories):
     async def setUp(self) -> None:
         await TestRepositories.setUp(self)
         inserted_id = await self.repositories.users.insert(user_data)
-        user_data[User.__id_attr__] = inserted_id
+        user_data[User._id_attr] = inserted_id
         self.users = self.repositories.users

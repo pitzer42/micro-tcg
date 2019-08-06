@@ -18,7 +18,7 @@ class TestGamepad(Gamepad):
         )
         if expect_success:
             response_json = await response.json()
-            self.user.token = response_json[User.__token_attr__]
+            self.user.token = response_json[User._token_attr]
         return response
 
     async def login_with_wrong_name(self):

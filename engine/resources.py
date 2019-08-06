@@ -5,6 +5,15 @@ from engine.views import (
     match_view
 )
 
+GET = 'GET'
+PUT = 'PUT'
+WILDCARD = '*'
+
+DEFAULT_CORS_OPTIONS = aiohttp_cors.ResourceOptions(
+    expose_headers=WILDCARD,
+    allow_headers=WILDCARD
+)
+
 
 class Resource:
 
@@ -33,20 +42,12 @@ class Resource:
                 pass
 
 
-default_cors_options = aiohttp_cors.ResourceOptions(
-    expose_headers='*',
-    allow_headers='*'
-)
-
-__GET__ = 'GET'
-__PUT__ = 'PUT'
-
 users = Resource(
     name='users',
     path='/users',
     routes={
-        __GET__: user_view.list_all,
-        __PUT__: user_view.insert_one
+        GET: user_view.list_all,
+        PUT: user_view.insert_one
     }
 )
 
@@ -54,7 +55,7 @@ login = Resource(
     name='login',
     path='/login',
     routes={
-        __GET__: user_view.login
+        GET: user_view.login
     }
 )
 
@@ -62,7 +63,7 @@ waiting_list = Resource(
     name='waiting_list',
     path='/waiting_list',
     routes={
-        __GET__: match_view.enter_waiting_list
+        GET: match_view.enter_waiting_list
     }
 )
 
@@ -70,11 +71,11 @@ secret = Resource(
     name='secret',
     path='/secret',
     routes={
-        __GET__: user_view.protected_view
+        GET: user_view.protected_view
     }
 )
 
-__resources__ = [
+_tracked_resources = [
     users,
     login,
     waiting_list,
@@ -84,9 +85,9 @@ __resources__ = [
 
 def setup_routes(app):
     cors = aiohttp_cors.setup(app, defaults={
-        '*': default_cors_options
+        WILDCARD: DEFAULT_CORS_OPTIONS
     })
 
-    for resource in __resources__:
+    for resource in _tracked_resources:
         resource.register(app.router)
         resource.configure_cors(cors)
