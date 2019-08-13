@@ -1,5 +1,9 @@
+from engine.repos.schemas.user import (
+    name_attr,
+    password_attr,
+    token_attr
+)
 
-from engine.models.user import User
 from engine.controllers import auth_user
 
 from engine.views import unauthorized, send_json
@@ -50,17 +54,20 @@ async def list_all(request, repositories=None, **kwargs):
 async def login(request, json=None, repositories=None, **kwargs):
     if None in (json, repositories):
         return await unauthorized(request)
-    if User._name_attr not in json:
+
+    if name_attr not in json:
         return await unauthorized(request)
-    name = json[User._name_attr]
-    if User._password_attr not in json:
+    name = json[name_attr]
+
+    if password_attr not in json:
         return await unauthorized(request)
-    password = json[User._password_attr]
+    password = json[password_attr]
+
     token = await auth_user.login(repositories.users, name, password)
     if token is None:
         return await unauthorized(request)
     token = str(token)
-    response_data = dict(token=token)
+    response_data = {token_attr: token}
     return await send_json(response_data, **kwargs)
 
 

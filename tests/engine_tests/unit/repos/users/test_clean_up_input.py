@@ -5,7 +5,10 @@ from tests.engine_tests.unit.repos.users import (
     user_data_without_id
 )
 
-from engine.models.user import User
+from engine.repos.schemas.user import (
+    uid_attr,
+    password_attr
+)
 from engine.repos.users import clean_up_input
 
 
@@ -23,13 +26,13 @@ class TestCleanUpInput(unittest.TestCase):
 
     def test_removes_none_id(self):
         clean_data = clean_up_input(user_data_without_id)
-        self.assertNotIn(User._id_attr, clean_data)
+        self.assertNotIn(uid_attr, clean_data)
 
     def test_preserves_not_none_id(self):
         clean_data = clean_up_input(user_data)
-        self.assertIn(User._id_attr, clean_data)
+        self.assertIn(uid_attr, clean_data)
 
     def test_encrypt_password(self):
         clean_data = clean_up_input(user_data)
-        password = clean_data[User._password_attr]
+        password = clean_data[password_attr]
         self.assertIsInstance(password, bytes)

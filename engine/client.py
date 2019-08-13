@@ -15,10 +15,10 @@ class Gamepad:
             user: User = None):
 
         def generate_user() -> User:
-            return User(**{
-                User._name_attr: str(id(self)),
-                User._password_attr: str(id(self)),
-            })
+            return User(
+                name=str(id(self)),
+                password=str(id(self))
+            )
 
         self.session: ClientSession = session
         self.base_url: str = base_url

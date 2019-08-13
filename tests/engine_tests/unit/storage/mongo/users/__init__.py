@@ -3,7 +3,7 @@ from tests import run_async
 from tests.engine_tests.unit.repos.users import user_data
 from tests.engine_tests.unit.storage.mongo import TestRepositories
 
-from engine.models.user import User
+from engine.repos.schemas.user import uid_attr
 
 
 class TestUsers(TestRepositories):
@@ -12,5 +12,5 @@ class TestUsers(TestRepositories):
     async def setUp(self) -> None:
         await TestRepositories.setUp(self)
         inserted_id = await self.repositories.users.insert(user_data)
-        user_data[User._id_attr] = inserted_id
+        user_data[uid_attr] = inserted_id
         self.users = self.repositories.users

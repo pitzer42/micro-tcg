@@ -1,15 +1,20 @@
-from engine.models.user import User
+from engine.repos.schemas.user import (
+    uid_attr,
+    name_attr,
+    token_attr,
+    password_attr
+)
 
 user_data = {
-    User._id_attr: '123',
-    User._name_attr: 'tester',
-    User._token_attr: 'some_token',
-    User._password_attr: 'secret_password'
+    uid_attr: '123',
+    name_attr: 'tester',
+    token_attr: 'some_token',
+    password_attr: 'secret_password'
 }
 
 user_data_without_id = {
-    User._id_attr: None,
-    User._name_attr: 'tester',
-    User._token_attr: 'some_token',
-    User._password_attr: 'secret_password'
+    uid_attr: None,
+    name_attr: 'tester',
+    token_attr: 'some_token',
+    password_attr: 'secret_password'
 }

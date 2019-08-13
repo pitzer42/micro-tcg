@@ -2,7 +2,7 @@ from tests import run_async
 
 from tests.engine_tests.unit.storage.mongo.users import TestUsers
 
-from engine.models.user import User
+from engine.repos.schemas.user import password_attr
 from engine.crypt import equals_to_encrypted
 
 
@@ -13,12 +13,12 @@ class TestRepositoryConstraints(TestUsers):
         clean_password = 'plain_text'
         wrong_password = 'this_is_the_wrong_password'
         user_data = {
-            User._password_attr: clean_password
+            password_attr: clean_password
         }
 
         inserted_id = await self.users.insert(user_data)
         saved_user = await self.users.get_by_id(inserted_id)
-        hashed_password = saved_user[User._password_attr]
+        hashed_password = saved_user[password_attr]
 
         expected_true = equals_to_encrypted(clean_password, hashed_password)
         expected_false = equals_to_encrypted(wrong_password, hashed_password)

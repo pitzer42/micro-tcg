@@ -1,10 +1,17 @@
 from typing import List, NoReturn
 
+from engine.repos.schemas.user import (
+    uid_attr,
+    token_attr,
+    name_attr
+)
+
 from engine.repos.users import (
     Users,
     clean_up_input,
     clean_up_output
 )
+
 from engine.models.user import User
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -28,37 +35,38 @@ class MongoUsers(Users):
 
     async def get_by_id(self, user_id: str) -> User:
         return await self.collection.find_one({
-            User._id_attr: user_id
+            uid_attr: user_id
         })
 
     async def get_by_name(self, name: str) -> User:
-        return await self.collection.find_one({
-            User._name_attr: name
+        user_data = await self.collection.find_one({
+            name_attr: name
         })
+        return User(**user_data)
 
     async def get_by_token(self, token) -> User:
         return await self.collection.find_one({
-            User._token_attr: token
+            token_attr: token
         })
 
     async def set_token(self, user_id: int, token) -> NoReturn:
         query = {
-            User._id_attr: user_id
+            uid_attr: user_id
         }
         update = {
             '$set': {
-                User._token_attr: token
+                token_attr: token
             }
         }
         return await self.collection.update_one(query, update)
 
     async def replace_token(self, old_token, new_token) -> NoReturn:
         query = {
-            User._token_attr: old_token
+            token_attr: old_token
         }
         update = {
             '$set': {
-                User._token_attr: new_token
+                token_attr: new_token
             }
         }
         return await self.collection.update_one(query, update)

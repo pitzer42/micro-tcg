@@ -10,16 +10,14 @@ from engine.crypt import (
 
 
 async def login(users: Users, name: str, password: str):
-    user_data = await users.get_by_name(name)
-    if user_data is None:
+    user = await users.get_by_name(name)
+    if user is None:
         return
-    password_hash = user_data[User._password_attr]
-    if not equals_to_encrypted(password, password_hash):
+    if not equals_to_encrypted(password, user.password):
         return
-    user_id = user_data[User._id_attr]
-    token = get_timestamp() + str(user_id)
+    token = get_timestamp() + str(user.uid)
     token = encrypt(token)
-    await users.set_token(user_id, token)
+    await users.set_token(user.uid, token)
     return token
 
 
