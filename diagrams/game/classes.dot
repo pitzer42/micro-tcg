@@ -1,7 +1,0 @@
-digraph "classes" {
-charset="utf-8"
-rankdir=BT
-"0" [label="{Card|attack : int\lcost : NoneType\ldefense : int\lname : NoneType\l|}", shape="record"];
-"1" [label="{Player|deck : NoneType\lfield : NoneType\lgraveyard : NoneType\lhand : NoneType\lname : NoneType\lresources : NoneType\l|}", shape="record"];
-"2" [label="{Resource|\l|enough()\lsub()\lsum()\l}", shape="record"];
-}
