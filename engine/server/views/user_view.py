@@ -26,7 +26,10 @@ class UserView(web.View, CorsViewMixin):
     async def put(self):
         try:
             json_request = await self.request.json()
-            command_result = await self.users.insert(json_request, data_port=dict_to_password_hashed_dict)
+            command_result = await self.users.insert(
+                json_request,
+                data_port=dict_to_password_hashed_dict
+            )
             return web.json_response(
                 dict(
                     inserted_id=str(command_result.inserted_id)

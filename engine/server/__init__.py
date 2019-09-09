@@ -23,7 +23,7 @@ def _create_cors(app: web.Application):
     return aiohttp_cors.setup(app, defaults=defaults)
 
 
-def create_game_server(
+def create_game_app(
         db=AsyncIOMotorClient().micro_tcg,
         user_repo_factory=MongoUserRepository):
 

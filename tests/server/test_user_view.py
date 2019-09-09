@@ -1,3 +1,5 @@
+from aiohttp.test_utils import unittest_run_loop
+
 from tests.server.game_server_test_case import GameServerTestCase
 
 from tests.utils import sync
