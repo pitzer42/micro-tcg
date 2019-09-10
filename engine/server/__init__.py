@@ -4,6 +4,7 @@ from aiohttp import web
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from engine.models.remote_party import PartyFactory
+from engine.models.game_loop import default_game_loop
 
 from engine.repositories_mongo.mongo_user_repository import MongoUserRepository
 
@@ -25,13 +26,15 @@ def _create_cors(app: web.Application):
 
 def create_game_app(
         db=AsyncIOMotorClient().micro_tcg,
-        user_repo_factory=MongoUserRepository):
+        user_repo_factory=MongoUserRepository,
+        game_loop=default_game_loop):
 
     users = user_repo_factory(db)
 
     app = web.Application()
     app[app_schema.user_repo] = users
     app[app_schema.party_factory] = PartyFactory(2)
+    app[app_schema.game_loop] = game_loop
 
     cors = _create_cors(app)
 
@@ -48,5 +51,5 @@ def create_game_app(
     return app
 
 
-def run_game_server(server):
-    web.run_app(server)
+def start_game_server(game_app):
+    web.run_app(game_app)

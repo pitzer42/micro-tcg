@@ -16,6 +16,10 @@ class GameView(web.View, CorsViewMixin):
     def party_factory(self) -> PartyFactory:
         return self.request.app[app_schema.party_factory]
 
+    @property
+    def game_loop(self) -> PartyFactory:
+        return self.request.app[app_schema.game_loop]
+
     async def get(self):
         ws = web.WebSocketResponse()
         await ws.prepare(self.request)
@@ -25,6 +29,8 @@ class GameView(web.View, CorsViewMixin):
         )
         await player.send(ack)
         party = await self.party_factory.gather(player)
-        party.broadcast('game on')
+
+        await self.game_loop(player, party)
+
 
 

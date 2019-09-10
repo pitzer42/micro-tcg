@@ -25,17 +25,18 @@ class PartyFactory:
         self._limit = limit
         self._buffer = list()
         self._signals = list()
+        self._party: RemoteParty = None
 
     async def gather(self, player: RemotePlayer) -> RemoteParty:
-        party: RemoteParty = None
+        self._party = None
         signal = asyncio.Event()
         self._buffer.append(player)
         self._signals.append(signal)
         if self._is_full():
-            party = self._create_party()
+            self._party = self._create_party()
         else:
             await signal.wait()
-        return party
+        return self._party
 
     def _is_full(self):
         return len(self._buffer) >= self._limit
