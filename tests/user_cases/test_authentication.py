@@ -1,4 +1,4 @@
-from engine.use_cases.authentication import Authentication
+from engine.authentication import Authentication
 
 from tests.repositories.user_repo_test_case import UserRepositoryTestCase
 from tests.utils import sync

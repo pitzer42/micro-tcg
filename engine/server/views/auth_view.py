@@ -9,7 +9,7 @@ from engine.server.views.data_ports import (
     token_to_authentication_json
 )
 
-from engine.use_cases.authentication import Authentication
+from engine.authentication import Authentication
 
 
 class AuthView(web.View, CorsViewMixin):

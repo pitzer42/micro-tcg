@@ -6,3 +6,6 @@ from engine.models.remote_player import RemotePlayer
 
 async def default_game_loop(player: RemotePlayer, party: RemoteParty) -> NoReturn:
     raise NotImplemented()
+
+
+# TODO: game_loop with authentication
